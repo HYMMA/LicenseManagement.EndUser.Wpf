@@ -9,7 +9,6 @@
 		<license type="expression">MIT</license>
 		<description>WPF UI components for license-management.com end-user SDK. Provides ready-to-use views, view models, and converters for license registration and management workflows.</description>
 		<releaseNotes>Initial public release with views, view models, converters, and validation rules.</releaseNotes>
-		<icon>padlock.ico</icon>
 		<projectUrl>https://github.com/HYMMA/LicenseManagement.EndUser.Wpf</projectUrl>
 		<repository type="git" url="https://github.com/HYMMA/LicenseManagement.EndUser.Wpf.git" />
 		<readme>README.md</readme>
@@ -21,7 +20,6 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="padlock.ico" target="" />
 		<file src="README.md" target="" />
 		<file src="bin\Release\LicenseManagement.EndUser.Wpf.dll" target="lib\net481" />
 		<file src="bin\Release\LicenseManagement.EndUser.Wpf.pdb" target="lib\net481" />
