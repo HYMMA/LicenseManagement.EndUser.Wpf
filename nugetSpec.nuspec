@@ -15,13 +15,13 @@
 		<tags>license licensing wpf ui components views viewmodels hymma license-management</tags>
 		<dependencies>
 			<group targetFramework=".NETFramework4.8.1">
-				<dependency id="Hymma.Lm.EndUser" version="1.0.0" />
+				<dependency id="Hymma.Lm.EndUser" version="1.0.1" />
 			</group>
 		</dependencies>
 	</metadata>
 	<files>
 		<file src="README.md" target="" />
-		<file src="bin\Release\LicenseManagement.EndUser.Wpf.dll" target="lib\net481" />
-		<file src="bin\Release\LicenseManagement.EndUser.Wpf.pdb" target="lib\net481" />
+		<file src="bin\Release\Hymma.Lm.EndUser.Wpf.dll" target="lib\net481" />
+		<file src="bin\Release\Hymma.Lm.EndUser.Wpf.pdb" target="lib\net481" />
 	</files>
 </package>
