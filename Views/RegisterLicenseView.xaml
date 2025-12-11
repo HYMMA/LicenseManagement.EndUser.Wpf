@@ -1,0 +1,178 @@
+﻿<Window x:Class="Hymma.Lm.EndUser.Wpf.Views.RegisterLicenseView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Hymma.Lm.EndUser.Wpf.Views"
+        mc:Ignorable="d"
+        xmlns:rules='clr-namespace:Hymma.Lm.EndUser.Wpf.Rules'
+        Name='thisView'
+        Title="Register License"
+        Height="230"
+        Width="600">
+  <Window.Resources>
+    <rules:ReceiptCodeRule x:Key='ReceiptCodeRule' />
+    <!--Styles-->
+    <Thickness x:Key='m-10'
+               Left='10'
+               Top='10'
+               Bottom='10'
+               Right='10' />
+    <Thickness x:Key='m-20'
+               Left='20'
+               Top='20'
+               Bottom='20'
+               Right='20' />
+    <Thickness x:Key='m5'
+               Left='5'
+               Top='5'
+               Bottom='5'
+               Right='5' />
+    <Thickness x:Key='my-10'
+               Left='0'
+               Top='10'
+               Bottom='10'
+               Right='0' />
+    <Thickness x:Key='mx-10'
+               Left='10'
+               Top='0'
+               Bottom='0'
+               Right='10' />
+    <Thickness x:Key='mr-10'
+               Left='00'
+               Top='0'
+               Bottom='0'
+               Right='10' />
+    <Thickness x:Key='ml-10'
+               Left='10'
+               Top='0'
+               Bottom='0'
+               Right='0' />
+    <Thickness x:Key='mt-10'
+               Left='0'
+               Top='10'
+               Bottom='0'
+               Right='0' />
+    <Style x:Key='boldText'>
+      <Setter Property='TextElement.FontWeight'
+              Value='Bold' />
+    </Style>
+    <Style x:Key='ErrorText'>
+      <Setter Property='TextBlock.Foreground'
+              Value='DarkRed' />
+    </Style>
+    <Style x:Key='grayText'>
+      <Setter Property='TextElement.Foreground'
+              Value='Gray' />
+    </Style>
+    <Style TargetType='StackPanel'>
+      <Setter Property='Margin'
+              Value='{StaticResource m5}'></Setter>
+    </Style>
+    <Style TargetType='TextBox'>
+      <Style.Resources>
+        <Style TargetType='Border'>
+          <Setter Property='CornerRadius'
+                  Value='5' />
+          <Setter Property='Padding'
+                  Value='10' />
+        </Style>
+      </Style.Resources>
+    </Style>
+    <Style TargetType='Label'>
+      <Style.Resources>
+        <Style TargetType='Border'>
+          <Setter Property='CornerRadius'
+                  Value='5' />
+          <Setter Property='BorderThickness'
+                  Value='4' />
+        </Style>
+      </Style.Resources>
+    </Style>
+    <Style TargetType="Button">
+      <Setter Property='Padding'
+              Value='6' />
+      <Setter Property='Cursor'
+              Value='Hand' />
+      <Setter Property='Background'
+              Value='Transparent' />
+      <Setter Property='Margin'
+              Value='0,16,0,0' />
+      <Style.Resources>
+        <Style TargetType='Border'>
+          <Setter Property='CornerRadius'
+                  Value='5'></Setter>
+        </Style>
+      </Style.Resources>
+    </Style>
+    <ControlTemplate x:Key='noStylesTemplate'>
+      <StackPanel>
+        <AdornedElementPlaceholder />
+      </StackPanel>
+    </ControlTemplate>
+  </Window.Resources>
+  <StackPanel Orientation='Vertical'
+              Margin='{DynamicResource m-20}'>
+    <Label Content='Please enter your product key:' />
+    <StackPanel Orientation='Vertical'>
+      <TextBox x:Name='receiptCode'
+               BorderBrush='Black'
+               Validation.ErrorTemplate='{StaticResource ResourceKey=noStylesTemplate}'
+               FontSize='16'>
+        <TextBox.Style>
+          <Style TargetType='TextBox'
+                 BasedOn='{StaticResource ResourceKey={x:Type TextBox}}'>
+            <Style.Triggers>
+              <Trigger Property='Validation.HasError'
+                       Value='True'>
+                <Setter Property='ToolTip'
+                        Value='{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)/ErrorContent}' />
+              </Trigger>
+            </Style.Triggers>
+          </Style>
+        </TextBox.Style>
+        <TextBox.Text>
+          <Binding Path='ReceiptCode'
+                   UpdateSourceTrigger='LostFocus'>
+            <Binding.ValidationRules>
+              <rules:ReceiptCodeRule />
+            </Binding.ValidationRules>
+          </Binding>
+        </TextBox.Text>
+      </TextBox>
+      <!--Error message-->
+      <Label Margin='0 0 0 0'
+             Height='32'
+             Style='{StaticResource ResourceKey=ErrorText}'
+             Content='{Binding ElementName=receiptCode, Path=(Validation.Errors)/ErrorContent}' />
+    </StackPanel>
+    <!--buttons-->
+    <StackPanel Orientation='Horizontal'
+                Margin='5,0,5,0'>
+      <Button Background='Cornsilk'
+              x:Name='Submit'
+              Command='{Binding Register}'
+              CommandParameter='{x:Reference Name=thisView}'
+              Margin='0,0,0,0'>Submit
+        <Button.Style>
+          <Style TargetType='Button'
+                 BasedOn='{StaticResource ResourceKey={x:Type Button}}'>
+            <Style.Triggers>
+              <MultiDataTrigger>
+                <Setter Property='IsEnabled'
+                        Value='False' />
+                <MultiDataTrigger.Conditions>
+                  <Condition Value='True'
+                             Binding='{Binding ElementName=receiptCode, Path=(Validation.HasError)}' />
+                </MultiDataTrigger.Conditions>
+              </MultiDataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Button.Style>
+      </Button>
+      <Button  Content='Cancel'
+               IsCancel='True'
+               Margin='10,0,0,0' />
+    </StackPanel>
+  </StackPanel>
+</Window>

@@ -1,0 +1,45 @@
+name: Publish to NuGet
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Extract version from tag
+      id: get_version
+      shell: pwsh
+      run: |
+        $version = "${{ github.ref_name }}" -replace '^v', ''
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+
+    - name: Restore NuGet packages
+      run: nuget restore LicenseManagement.EndUser.Wpf.csproj -PackagesDirectory packages
+
+    - name: Build Release
+      run: msbuild LicenseManagement.EndUser.Wpf.csproj /p:Configuration=Release /p:Platform="Any CPU"
+
+    - name: Update nuspec version
+      shell: pwsh
+      run: |
+        $nuspec = Get-Content nugetSpec.nuspec -Raw
+        $nuspec = $nuspec -replace '<version>.*</version>', "<version>${{ steps.get_version.outputs.VERSION }}</version>"
+        Set-Content nugetSpec.nuspec $nuspec
+
+    - name: Pack NuGet package
+      run: nuget pack nugetSpec.nuspec -OutputDirectory nupkg
+
+    - name: Push to NuGet
+      run: nuget push nupkg/*.nupkg -ApiKey ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate
