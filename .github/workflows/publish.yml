@@ -29,7 +29,7 @@ jobs:
       run: nuget restore LicenseManagement.EndUser.Wpf.csproj -PackagesDirectory packages
 
     - name: Build Release
-      run: msbuild LicenseManagement.EndUser.Wpf.csproj /p:Configuration=Release /p:Platform="Any CPU"
+      run: msbuild LicenseManagement.EndUser.Wpf.csproj /p:Configuration=Release /p:Platform=AnyCPU
 
     - name: Update nuspec version
       shell: pwsh
