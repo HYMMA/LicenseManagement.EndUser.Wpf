@@ -148,8 +148,8 @@
   </ItemGroup>
   <!-- CI/CD: use NuGet package reference -->
   <ItemGroup Condition="!Exists('..\Hymma.LM\LicenseManagement.EndUser\LicenseManagement.EndUser\LicenseManagement.EndUser.csproj')">
-    <Reference Include="LicenseManagement.EndUser">
-      <HintPath>packages\Hymma.Lm.EndUser.1.0.0\lib\net481\LicenseManagement.EndUser.dll</HintPath>
+    <Reference Include="Hymma.Lm.EndUser">
+      <HintPath>packages\Hymma.Lm.EndUser.1.0.1\lib\net481\Hymma.Lm.EndUser.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
