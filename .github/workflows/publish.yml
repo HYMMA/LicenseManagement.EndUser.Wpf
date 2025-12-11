@@ -42,4 +42,6 @@ jobs:
       run: nuget pack nugetSpec.nuspec -OutputDirectory nupkg
 
     - name: Push to NuGet
-      run: nuget push nupkg/*.nupkg -ApiKey ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate
+      shell: pwsh
+      run: |
+        Get-ChildItem nupkg/*.nupkg | ForEach-Object { nuget push $_.FullName -ApiKey ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate }
