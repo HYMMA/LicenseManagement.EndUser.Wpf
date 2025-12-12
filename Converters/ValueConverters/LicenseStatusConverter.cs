@@ -29,7 +29,7 @@ namespace Hymma.Lm.EndUser.Wpf.Converters
                     return ACTIVE_PAID;
                 case LicenseStatusTitles.ValidTrial:
                     return ACTIVE_TRIAL;
-                case LicenseStatusTitles.InValidTrial:
+                case LicenseStatusTitles.InvalidTrial:
                     return INVALID_TRIAL;
                 case LicenseStatusTitles.ReceiptExpired:
                     return RECEIPT_EXPIRED;
@@ -60,7 +60,7 @@ namespace Hymma.Lm.EndUser.Wpf.Converters
                     return Visibility.Collapsed;
                 case LicenseStatusTitles.ValidTrial:
                     return Visibility.Visible;
-                case LicenseStatusTitles.InValidTrial:
+                case LicenseStatusTitles.InvalidTrial:
                     return Visibility.Visible;
                 case LicenseStatusTitles.ReceiptExpired:
                     return Visibility.Visible;
@@ -91,7 +91,7 @@ namespace Hymma.Lm.EndUser.Wpf.Converters
                     return new SolidColorBrush(Colors.Azure);
                 case LicenseStatusTitles.ValidTrial:
                     return new SolidColorBrush(Colors.Azure);
-                case LicenseStatusTitles.InValidTrial:
+                case LicenseStatusTitles.InvalidTrial:
                     return new SolidColorBrush(Colors.LightSalmon);
                 case LicenseStatusTitles.ReceiptExpired:
                     return new SolidColorBrush(Colors.LightSalmon);
@@ -122,7 +122,7 @@ namespace Hymma.Lm.EndUser.Wpf.Converters
                     return new SolidColorBrush(Colors.Green);
                 case LicenseStatusTitles.ValidTrial:
                     return new SolidColorBrush(Colors.Blue);
-                case LicenseStatusTitles.InValidTrial:
+                case LicenseStatusTitles.InvalidTrial:
                     return new SolidColorBrush(Colors.DarkRed);
                 case LicenseStatusTitles.ReceiptExpired:
                     return new SolidColorBrush(Colors.DarkRed);
@@ -192,7 +192,7 @@ namespace Hymma.Lm.EndUser.Wpf.Converters
             {
                 case LicenseStatusTitles.ReceiptExpired: return Visibility.Collapsed;
                 case LicenseStatusTitles.ValidTrial: return Visibility.Collapsed;
-                case LicenseStatusTitles.InValidTrial: return Visibility.Collapsed;
+                case LicenseStatusTitles.InvalidTrial: return Visibility.Collapsed;
                 case LicenseStatusTitles.ReceiptUnregistered: return Visibility.Collapsed;
                 default:
                     return Visibility.Visible;
