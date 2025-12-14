@@ -178,7 +178,7 @@ MIT - See [LICENSE](LICENSE) for details.
 
 ## Related Packages
 
-- [LicenseManagement.EndUser](https://www.nuget.org/packages/Hymma.Lm.EndUser) - Core end-user SDK (includes [WiX Custom Action sample](https://github.com/HYMMA/LicenseManagement.EndUser/tree/main/samples/WixCustomAction))
+- [LicenseManagement.EndUser](https://www.nuget.org/packages/Hymma.Lm.EndUser) - Core end-user SDK (includes [WiX Custom Action sample](https://github.com/HYMMA/LicenseManagement.EndUser/tree/master/samples/WixCustomAction))
 - [LicenseManagement.Client](https://www.nuget.org/packages/LicenseManagement.Client) - Server-side SDK for vendors
 
 ## Documentation
