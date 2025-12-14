@@ -25,13 +25,37 @@ jobs:
         $version = "${{ github.ref_name }}" -replace '^v', ''
         echo "VERSION=$version" >> $env:GITHUB_OUTPUT
 
+    - name: Check if NuGet package already exists
+      id: check_nuget
+      shell: pwsh
+      run: |
+        $packageId = "Hymma.Lm.EndUser.Wpf"
+        $version = "${{ steps.get_version.outputs.VERSION }}"
+        $url = "https://api.nuget.org/v3-flatcontainer/$($packageId.ToLower())/index.json"
+        try {
+          $response = Invoke-RestMethod -Uri $url -ErrorAction Stop
+          if ($response.versions -contains $version) {
+            echo "Package $packageId version $version already exists on NuGet.org"
+            echo "EXISTS=true" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "Package $packageId version $version does not exist on NuGet.org"
+            echo "EXISTS=false" >> $env:GITHUB_OUTPUT
+          }
+        } catch {
+          echo "Package $packageId not found on NuGet.org (new package)"
+          echo "EXISTS=false" >> $env:GITHUB_OUTPUT
+        }
+
     - name: Restore NuGet packages
+      if: steps.check_nuget.outputs.EXISTS != 'true'
       run: nuget restore LicenseManagement.EndUser.Wpf.csproj -PackagesDirectory packages
 
     - name: Build Release
+      if: steps.check_nuget.outputs.EXISTS != 'true'
       run: msbuild LicenseManagement.EndUser.Wpf.csproj /p:Configuration=Release /p:Platform=AnyCPU
 
     - name: Update nuspec version
+      if: steps.check_nuget.outputs.EXISTS != 'true'
       shell: pwsh
       run: |
         $nuspec = Get-Content nugetSpec.nuspec -Raw
@@ -39,9 +63,54 @@ jobs:
         Set-Content nugetSpec.nuspec $nuspec
 
     - name: Pack NuGet package
+      if: steps.check_nuget.outputs.EXISTS != 'true'
       run: nuget pack nugetSpec.nuspec -OutputDirectory nupkg
 
     - name: Push to NuGet
+      if: steps.check_nuget.outputs.EXISTS != 'true'
       shell: pwsh
       run: |
         Get-ChildItem nupkg/*.nupkg | ForEach-Object { nuget push $_.FullName -ApiKey ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate }
+
+    - name: Extract changelog for this version
+      id: changelog
+      shell: pwsh
+      run: |
+        $version = "${{ steps.get_version.outputs.VERSION }}"
+        $changelog = Get-Content CHANGELOG.md -Raw
+
+        # Extract the section for this version
+        $pattern = "(?s)## \[$version\].*?(?=## \[|$)"
+        if ($changelog -match $pattern) {
+          $notes = $Matches[0].Trim()
+          # Escape for GitHub Actions output
+          $notes = $notes -replace '%', '%25'
+          $notes = $notes -replace "`n", '%0A'
+          $notes = $notes -replace "`r", '%0D'
+          echo "NOTES=$notes" >> $env:GITHUB_OUTPUT
+        } else {
+          echo "NOTES=Release version $version" >> $env:GITHUB_OUTPUT
+        }
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: v${{ steps.get_version.outputs.VERSION }}
+        body: |
+          ${{ steps.changelog.outputs.NOTES }}
+
+          ## NuGet Package
+
+          Install via NuGet:
+          ```
+          Install-Package Hymma.Lm.EndUser.Wpf -Version ${{ steps.get_version.outputs.VERSION }}
+          ```
+
+          Or via .NET CLI:
+          ```
+          dotnet add package Hymma.Lm.EndUser.Wpf --version ${{ steps.get_version.outputs.VERSION }}
+          ```
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
