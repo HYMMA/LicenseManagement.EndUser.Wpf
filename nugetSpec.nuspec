@@ -2,20 +2,20 @@
 <package>
 	<metadata minClientVersion="2.5">
 		<id>Hymma.Lm.EndUser.Wpf</id>
-		<version>1.2.2</version>
+		<version>1.2.3</version>
 		<authors>HYMMA</authors>
 		<owners>HYMMA</owners>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<license type="expression">MIT</license>
 		<description>WPF UI components for license-management.com end-user SDK. Provides ready-to-use views, view models, and converters for license registration and management workflows.</description>
-		<releaseNotes>Initial public release with views, view models, converters, and validation rules.</releaseNotes>
+		<releaseNotes>Updated dependency to Hymma.Lm.EndUser 1.0.6 with Dictionary serialization fix.</releaseNotes>
 		<projectUrl>https://github.com/HYMMA/LicenseManagement.EndUser.Wpf</projectUrl>
 		<repository type="git" url="https://github.com/HYMMA/LicenseManagement.EndUser.Wpf.git" />
 		<readme>README.md</readme>
 		<tags>license licensing wpf ui components views viewmodels hymma license-management</tags>
 		<dependencies>
 			<group targetFramework=".NETFramework4.8.1">
-				<dependency id="Hymma.Lm.EndUser" version="[1.0.5,)" />
+				<dependency id="Hymma.Lm.EndUser" version="[1.0.6,)" />
 			</group>
 		</dependencies>
 	</metadata>
