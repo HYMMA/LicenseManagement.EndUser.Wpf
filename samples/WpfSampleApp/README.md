@@ -196,6 +196,6 @@ The built-in views use resources from `AppResources.xaml`. Override styles in yo
 
 ## Related
 
-- [WiX Custom Action Sample](../../LicenseManagement.EndUser/samples/WixCustomAction/)
+- [WiX Custom Action Sample](https://github.com/HYMMA/LicenseManagement.EndUser/tree/master/samples/WixCustomAction)
 - [EndUser.Wpf README](../../README.md)
 - [Documentation](https://license-management.com/docs/)
