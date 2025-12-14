@@ -9,6 +9,11 @@ WPF UI components for [license-management.com](https://license-management.com) e
 
 This library provides ready-to-use WPF views and view models for license registration, validation display, and unregistration workflows.
 
+> [!IMPORTANT]
+> **Account Required**: This library requires a publisher account at [license-management.com](https://license-management.com).
+>
+> **Free with Dev Subscription**: A developer subscription is available at no cost, which provides full access to all features for development and testing purposes.
+
 ## Features
 
 - **Pre-built Views** - Ready-to-use WPF windows for common license operations
