@@ -135,11 +135,42 @@ var licenseVm = new LicenseViewModel
 </Application.Resources>
 ```
 
+## Sample Application
+
+We provide a complete sample WPF application demonstrating real-world usage patterns:
+
+### WPF Sample App
+
+The [WPF Sample Application](samples/WpfSampleApp/) demonstrates:
+- License validation at application startup
+- Handling different license states (Valid, Trial, Expired)
+- Feature gating based on license status
+- Integration with built-in license management UI
+- Centralized license service pattern
+
+```csharp
+// Example: Validate license at startup
+private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+{
+    var context = _licenseService.ValidateLicense(
+        onLicFileNotFound: DownloadLicenseFile,
+        onTrialEnded: HandleTrialEnded
+    );
+    UpdateFeatureAccess(context.LicenseModel.Status);
+}
+```
+
+See the [sample README](samples/WpfSampleApp/README.md) for complete setup instructions.
+
 ## Requirements
 
 - .NET Framework 4.8.1
 - WPF (Windows Presentation Foundation)
 - [Hymma.Lm.EndUser](https://www.nuget.org/packages/Hymma.Lm.EndUser) (dependency)
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history and release notes.
 
 ## License
 
@@ -147,5 +178,10 @@ MIT - See [LICENSE](LICENSE) for details.
 
 ## Related Packages
 
-- [LicenseManagement.EndUser](https://www.nuget.org/packages/Hymma.Lm.EndUser) - Core end-user SDK
+- [LicenseManagement.EndUser](https://www.nuget.org/packages/Hymma.Lm.EndUser) - Core end-user SDK (includes [WiX Custom Action sample](https://github.com/HYMMA/LicenseManagement.EndUser/tree/main/samples/WixCustomAction))
 - [LicenseManagement.Client](https://www.nuget.org/packages/LicenseManagement.Client) - Server-side SDK for vendors
+
+## Documentation
+
+- [API Documentation](https://license-management.com/docs/)
+- [LLMs.txt for AI Tools](https://license-management.com/llms.txt)
