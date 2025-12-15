@@ -50,6 +50,14 @@ jobs:
       if: steps.check_nuget.outputs.EXISTS != 'true'
       run: nuget restore LicenseManagement.EndUser.Wpf.csproj -PackagesDirectory packages
 
+    - name: Install bundled packages for nuspec
+      if: steps.check_nuget.outputs.EXISTS != 'true'
+      shell: pwsh
+      run: |
+        # Install packages that are bundled in the nuspec but not in csproj
+        nuget install Hymma.Lm.EndUser -Version 1.3.0 -OutputDirectory packages
+        nuget install Hymma.HttpClientFactory -Version 1.0.8 -OutputDirectory packages
+
     - name: Build Release
       if: steps.check_nuget.outputs.EXISTS != 'true'
       run: msbuild LicenseManagement.EndUser.Wpf.csproj /p:Configuration=Release /p:Platform=AnyCPU
