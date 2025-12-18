@@ -19,8 +19,8 @@
 		<!-- Main assemblies -->
 		<file src="bin\Release\LicenseManagement.EndUser.Wpf.dll" target="lib\net481" />
 		<file src="bin\Release\LicenseManagement.EndUser.Wpf.pdb" target="lib\net481" />
-		<!-- Bundled dependencies from EndUser package - will need to build locally first -->
-		<file src="..\LicenseManagement.EndUser\LicenseManagement.EndUser\bin\Release\LicenseManagement.EndUser.dll" target="lib\net481" />
+		<!-- Bundled dependencies from EndUser package -->
+		<file src="packages\LicenseManagement.EndUser.2.0.0\lib\net481\LicenseManagement.EndUser.dll" target="lib\net481" />
 		<!-- Bundled dependencies from other packages -->
 		<file src="packages\Hymma.HttpClientFactory.1.0.8\lib\net45\Hymma.HttpClientFactory.dll" target="lib\net481" />
 		<file src="packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll" target="lib\net481" />
