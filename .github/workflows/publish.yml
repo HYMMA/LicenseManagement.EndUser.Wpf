@@ -46,6 +46,13 @@ jobs:
           echo "EXISTS=false" >> $env:GITHUB_OUTPUT
         }
 
+    - name: Install LicenseManagement.EndUser from NuGet
+      if: steps.check_nuget.outputs.EXISTS != 'true'
+      shell: pwsh
+      run: |
+        # Install the EndUser package first (required for build)
+        nuget install LicenseManagement.EndUser -Version 2.0.0 -OutputDirectory packages
+
     - name: Restore NuGet packages
       if: steps.check_nuget.outputs.EXISTS != 'true'
       run: nuget restore LicenseManagement.EndUser.Wpf.csproj -PackagesDirectory packages
@@ -54,8 +61,7 @@ jobs:
       if: steps.check_nuget.outputs.EXISTS != 'true'
       shell: pwsh
       run: |
-        # Install packages that are bundled in the nuspec but not in csproj
-        nuget install LicenseManagement.EndUser -Version 2.0.0 -OutputDirectory packages
+        # Install additional packages that are bundled in the nuspec
         nuget install Hymma.HttpClientFactory -Version 1.0.8 -OutputDirectory packages
 
     - name: Build Release
