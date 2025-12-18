@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Hymma.Lm.EndUser.Wpf.Converters
+namespace LicenseManagement.EndUser.Wpf.Converters
 {
     [ValueConversion(typeof(string), typeof(Visibility))]
     public class BooleanToVisibilityConverter : IValueConverter
@@ -39,7 +39,7 @@ namespace Hymma.Lm.EndUser.Wpf.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var val = value as Hymma.Lm.EndUser.Models.ProductModel;
+            var val = value as LicenseManagement.EndUser.Models.ProductModel;
             if (val != null)
             {
                 if (products == null)

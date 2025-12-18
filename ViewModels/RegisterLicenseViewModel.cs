@@ -1,6 +1,6 @@
-﻿using Hymma.Lm.EndUser.Models;
-using Hymma.Lm.EndUser.Wpf.Commands;
-using Hymma.Lm.EndUser.Wpf.Views;
+using LicenseManagement.EndUser.Models;
+using LicenseManagement.EndUser.Wpf.Commands;
+using LicenseManagement.EndUser.Wpf.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Hymma.Lm.EndUser.Wpf.ViewModels
+namespace LicenseManagement.EndUser.Wpf.ViewModels
 {
     internal class RegisterLicenseViewModel : BaseViewModel
     {

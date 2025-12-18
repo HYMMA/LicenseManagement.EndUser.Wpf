@@ -5,8 +5,8 @@
 // integrate into your application architecture (MVVM, DI containers, etc.)
 // =============================================================================
 
-using Hymma.Lm.EndUser;
-using Hymma.Lm.EndUser.Models;
+using LicenseManagement.EndUser;
+using LicenseManagement.EndUser.Models;
 using System;
 
 namespace LicenseManagement.Sample.Wpf.Services
@@ -181,7 +181,7 @@ namespace LicenseManagement.Sample.Wpf.Services
             if (_cachedContext?.LicenseModel == null)
                 return false;
 
-            return _cachedContext.LicenseModel.Status == Hymma.Lm.EndUser.License.LicenseStatusTitles.Valid;
+            return _cachedContext.LicenseModel.Status == LicenseManagement.EndUser.License.LicenseStatusTitles.Valid;
         }
 
         /// <summary>
@@ -192,7 +192,7 @@ namespace LicenseManagement.Sample.Wpf.Services
             if (_cachedContext?.LicenseModel == null)
                 return false;
 
-            return _cachedContext.LicenseModel.Status == Hymma.Lm.EndUser.License.LicenseStatusTitles.ValidTrial;
+            return _cachedContext.LicenseModel.Status == LicenseManagement.EndUser.License.LicenseStatusTitles.ValidTrial;
         }
 
         /// <summary>

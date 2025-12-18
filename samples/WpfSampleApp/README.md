@@ -1,6 +1,6 @@
 # WPF Sample Application
 
-This sample demonstrates how to integrate license management into a WPF desktop application using the `Hymma.Lm.EndUser.Wpf` package.
+This sample demonstrates how to integrate license management into a WPF desktop application using the `LicenseManagement.EndUser.Wpf` package.
 
 ## Overview
 
@@ -21,7 +21,7 @@ The sample shows:
 ## Prerequisites
 
 - .NET Framework 4.8.1
-- [Hymma.Lm.EndUser.Wpf](https://www.nuget.org/packages/Hymma.Lm.EndUser.Wpf) NuGet package
+- [LicenseManagement.EndUser.Wpf](https://www.nuget.org/packages/LicenseManagement.EndUser.Wpf) NuGet package (v2.0+)
 - Account at [license-management.com](https://license-management.com)
 
 ## Setup
@@ -96,14 +96,14 @@ else
 
 ### Built-in License UI
 
-The `Hymma.Lm.EndUser.Wpf` package includes pre-built windows for:
+The `LicenseManagement.EndUser.Wpf` package includes pre-built windows for:
 - Viewing license details
 - Registering a product key
 - Unregistering the computer
 
 ```csharp
 // Show the license management window
-var licenseWindow = new Hymma.Lm.EndUser.Wpf.Views.MainWindow
+var licenseWindow = new LicenseManagement.EndUser.Wpf.Views.MainWindow
 {
     License = LicenseViewModel.FromContext(context, products)
 };
@@ -182,7 +182,7 @@ The built-in views use resources from `AppResources.xaml`. Override styles in yo
 <Application.Resources>
     <ResourceDictionary>
         <ResourceDictionary.MergedDictionaries>
-            <ResourceDictionary Source="pack://application:,,,/Hymma.Lm.EndUser.Wpf;component/AppResources.xaml"/>
+            <ResourceDictionary Source="pack://application:,,,/LicenseManagement.EndUser.Wpf;component/AppResources.xaml"/>
             <!-- Your overrides -->
             <ResourceDictionary>
                 <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">

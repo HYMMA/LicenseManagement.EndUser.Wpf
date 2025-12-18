@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
-using Hymma.Lm.EndUser.License;
+using LicenseManagement.EndUser.License;
 
-namespace Hymma.Lm.EndUser.Wpf.Converters
+namespace LicenseManagement.EndUser.Wpf.Converters
 {
 
     [ValueConversion(typeof(LicenseStatusTitles), typeof(string))]

@@ -1,8 +1,8 @@
 # LicenseManagement.EndUser.Wpf
 
 [![Build and Test](https://github.com/HYMMA/LicenseManagement.EndUser.Wpf/actions/workflows/build.yml/badge.svg)](https://github.com/HYMMA/LicenseManagement.EndUser.Wpf/actions/workflows/build.yml)
-[![NuGet](https://img.shields.io/nuget/v/Hymma.Lm.EndUser.Wpf.svg)](https://www.nuget.org/packages/Hymma.Lm.EndUser.Wpf)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/Hymma.Lm.EndUser.Wpf.svg)](https://www.nuget.org/packages/Hymma.Lm.EndUser.Wpf)
+[![NuGet](https://img.shields.io/nuget/v/LicenseManagement.EndUser.Wpf.svg)](https://www.nuget.org/packages/LicenseManagement.EndUser.Wpf)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/LicenseManagement.EndUser.Wpf.svg)](https://www.nuget.org/packages/LicenseManagement.EndUser.Wpf)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 WPF UI components for [license-management.com](https://license-management.com) end-user SDK.
@@ -25,13 +25,16 @@ This library provides ready-to-use WPF views and view models for license registr
 ## Installation
 
 ```bash
-dotnet add package Hymma.Lm.EndUser.Wpf
+dotnet add package LicenseManagement.EndUser.Wpf
 ```
 
 Or via NuGet Package Manager:
 ```
-Install-Package Hymma.Lm.EndUser.Wpf
+Install-Package LicenseManagement.EndUser.Wpf
 ```
+
+> [!WARNING]
+> **Breaking Change in v2.0.0**: The package has been renamed from `Hymma.Lm.EndUser.Wpf` to `LicenseManagement.EndUser.Wpf`. See the [Migration Guide](#migrating-from-v1x) below.
 
 ## Components
 
@@ -39,10 +42,19 @@ Install-Package Hymma.Lm.EndUser.Wpf
 
 | View | Description |
 |------|-------------|
-| `MainWindow` | Main license management window |
+| `MainWindow` | Main license management window (standalone) |
+| `LicenseControl` | Embeddable UserControl for license management |
 | `RegisterLicenseView` | Product key/receipt code entry |
 | `UnregisterView` | Computer unregistration confirmation |
 | `ErrorView` | Error display with details |
+
+### Window vs UserControl
+
+This package provides two ways to display license management UI:
+
+- **`MainWindow`** - A standalone `Window` that can be shown as a dialog. Use this when you want to show license management in a separate popup window.
+
+- **`LicenseControl`** - A `UserControl` that can be embedded directly into your application's UI. Use this when you want to integrate license management into an existing window, tab, or settings panel.
 
 ### ViewModels
 
@@ -76,6 +88,43 @@ Install-Package Hymma.Lm.EndUser.Wpf
 | `ReceiptCodeRule` | Validates receipt code format |
 
 ## Quick Start
+
+### Show License Window (Dialog)
+
+```csharp
+using LicenseManagement.EndUser.Wpf.Views;
+using LicenseManagement.EndUser.Wpf.ViewModels;
+
+var mainWindow = new MainWindow();
+mainWindow.License = new LicenseViewModel
+{
+    Status = LicenseStatusTitles.Valid,
+    ExpirationDate = DateTime.UtcNow.AddMonths(6),
+    ProductName = "My Product"
+};
+mainWindow.ShowDialog();
+```
+
+### Embed LicenseControl in Your UI
+
+```xml
+<Window xmlns:views="clr-namespace:LicenseManagement.EndUser.Wpf.Views;assembly=LicenseManagement.EndUser.Wpf">
+    <Grid>
+        <!-- Other UI elements -->
+        <views:LicenseControl x:Name="licenseControl" />
+    </Grid>
+</Window>
+```
+
+```csharp
+// In code-behind or ViewModel
+licenseControl.License = new LicenseViewModel
+{
+    Status = LicenseStatusTitles.Valid,
+    ExpirationDate = DateTime.UtcNow.AddMonths(6),
+    ProductName = "My Product"
+};
+```
 
 ### Show Registration Dialog
 
@@ -166,7 +215,66 @@ See the [sample README](samples/WpfSampleApp/README.md) for complete setup instr
 
 - .NET Framework 4.8.1
 - WPF (Windows Presentation Foundation)
-- [Hymma.Lm.EndUser](https://www.nuget.org/packages/Hymma.Lm.EndUser) (dependency)
+- [LicenseManagement.EndUser](https://www.nuget.org/packages/LicenseManagement.EndUser) (dependency)
+
+## Migrating from v1.x
+
+Version 2.0.0 introduces breaking changes: the namespace has been renamed from `Hymma.Lm.EndUser.Wpf` to `LicenseManagement.EndUser.Wpf`.
+
+### Steps to Migrate
+
+1. **Update NuGet Package Reference**
+   ```bash
+   # Remove old package
+   dotnet remove package Hymma.Lm.EndUser.Wpf
+
+   # Add new package
+   dotnet add package LicenseManagement.EndUser.Wpf
+   ```
+
+2. **Update Namespace Imports in C#**
+   Replace all occurrences:
+   ```csharp
+   // Old
+   using Hymma.Lm.EndUser.Wpf.Views;
+   using Hymma.Lm.EndUser.Wpf.ViewModels;
+   using Hymma.Lm.EndUser.Wpf.Converters;
+
+   // New
+   using LicenseManagement.EndUser.Wpf.Views;
+   using LicenseManagement.EndUser.Wpf.ViewModels;
+   using LicenseManagement.EndUser.Wpf.Converters;
+   ```
+
+3. **Update XAML Namespaces**
+   ```xml
+   <!-- Old -->
+   xmlns:views="clr-namespace:Hymma.Lm.EndUser.Wpf.Views;assembly=Hymma.Lm.EndUser.Wpf"
+
+   <!-- New -->
+   xmlns:views="clr-namespace:LicenseManagement.EndUser.Wpf.Views;assembly=LicenseManagement.EndUser.Wpf"
+   ```
+
+4. **Update Resource Dictionary References**
+   ```xml
+   <!-- Old -->
+   <ResourceDictionary Source="pack://application:,,,/Hymma.Lm.EndUser.Wpf;component/AppResources.xaml"/>
+
+   <!-- New -->
+   <ResourceDictionary Source="pack://application:,,,/LicenseManagement.EndUser.Wpf;component/AppResources.xaml"/>
+   ```
+
+### What Changed
+
+| v1.x | v2.0.0 |
+|------|--------|
+| `Hymma.Lm.EndUser.Wpf` namespace | `LicenseManagement.EndUser.Wpf` namespace |
+| `Hymma.Lm.EndUser.Wpf.dll` | `LicenseManagement.EndUser.Wpf.dll` |
+| NuGet: `Hymma.Lm.EndUser.Wpf` | NuGet: `LicenseManagement.EndUser.Wpf` |
+
+### New in v2.0.0
+
+- **`LicenseControl`** - A new embeddable UserControl for integrating license management directly into your application's UI, as an alternative to the standalone `MainWindow` dialog.
 
 ## Changelog
 
@@ -178,7 +286,7 @@ MIT - See [LICENSE](LICENSE) for details.
 
 ## Related Packages
 
-- [LicenseManagement.EndUser](https://www.nuget.org/packages/Hymma.Lm.EndUser) - Core end-user SDK (includes [WiX Custom Action sample](https://github.com/HYMMA/LicenseManagement.EndUser/tree/master/samples/WixCustomAction))
+- [LicenseManagement.EndUser](https://www.nuget.org/packages/LicenseManagement.EndUser) - Core end-user SDK (includes [WiX Custom Action sample](https://github.com/HYMMA/LicenseManagement.EndUser/tree/master/samples/WixCustomAction))
 - [LicenseManagement.Client](https://www.nuget.org/packages/LicenseManagement.Client) - Server-side SDK for vendors
 
 ## Documentation

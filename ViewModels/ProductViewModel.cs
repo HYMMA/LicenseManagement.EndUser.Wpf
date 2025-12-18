@@ -1,4 +1,4 @@
-﻿using Hymma.Lm.EndUser.Models;
+using LicenseManagement.EndUser.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymma.Lm.EndUser.Wpf.ViewModels
+namespace LicenseManagement.EndUser.Wpf.ViewModels
 {
     public class ProductViewModel : BaseViewModel
     {

@@ -1,12 +1,12 @@
-﻿using Hymma.Lm.EndUser.Wpf.Commands;
-using Hymma.Lm.EndUser.Wpf.Views;
+using LicenseManagement.EndUser.Wpf.Commands;
+using LicenseManagement.EndUser.Wpf.Views;
 using System;
 using System.Collections.ObjectModel;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Input;
 
-namespace Hymma.Lm.EndUser.Wpf.ViewModels
+namespace LicenseManagement.EndUser.Wpf.ViewModels
 {
     public class UnregisterViewModel : BaseViewModel
     {

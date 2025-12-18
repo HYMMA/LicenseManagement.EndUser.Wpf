@@ -6,7 +6,7 @@
         <!-- Import the EndUser.Wpf resource dictionary for license UI components -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/Hymma.Lm.EndUser.Wpf;component/AppResources.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/LicenseManagement.EndUser.Wpf;component/AppResources.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

@@ -48,7 +48,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Hymma.Lm.EndUser.Wpf" Version="1.*" />
+    <PackageReference Include="LicenseManagement.EndUser.Wpf" Version="2.*" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">

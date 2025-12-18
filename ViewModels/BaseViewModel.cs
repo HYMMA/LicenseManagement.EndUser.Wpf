@@ -1,10 +1,10 @@
-﻿using Hymma.Lm.EndUser.Wpf.Views;
+using LicenseManagement.EndUser.Wpf.Views;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 
-namespace Hymma.Lm.EndUser.Wpf.ViewModels
+namespace LicenseManagement.EndUser.Wpf.ViewModels
 {
     public class BaseViewModel : INotifyPropertyChanged
     {

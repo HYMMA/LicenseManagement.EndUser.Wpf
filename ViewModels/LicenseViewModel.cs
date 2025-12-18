@@ -1,8 +1,8 @@
-﻿using Hymma.Lm.EndUser.Exceptions;
-using Hymma.Lm.EndUser.License;
-using Hymma.Lm.EndUser.Models;
-using Hymma.Lm.EndUser.Wpf.Commands;
-using Hymma.Lm.EndUser.Wpf.Views;
+using LicenseManagement.EndUser.Exceptions;
+using LicenseManagement.EndUser.License;
+using LicenseManagement.EndUser.Models;
+using LicenseManagement.EndUser.Wpf.Commands;
+using LicenseManagement.EndUser.Wpf.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,7 +15,9 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Xml.Serialization;
 
-namespace Hymma.Lm.EndUser.Wpf.ViewModels{
+namespace LicenseManagement.EndUser.Wpf.ViewModels
+{
+
     [XmlType("License")]
     public class LicenseViewModel : BaseViewModel
     {
@@ -373,4 +375,5 @@ namespace Hymma.Lm.EndUser.Wpf.ViewModels{
             view.ShowDialog();
         }
     }
-}
+}
+

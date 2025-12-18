@@ -1,7 +1,7 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Windows.Controls;
 
-namespace Hymma.Lm.EndUser.Wpf.Rules
+namespace LicenseManagement.EndUser.Wpf.Rules
 {
     internal class ReceiptCodeRule : ValidationRule
     {

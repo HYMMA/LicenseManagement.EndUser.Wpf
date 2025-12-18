@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Hymma.Lm.EndUser.Wpf.Converters
+namespace LicenseManagement.EndUser.Wpf.Converters
 {
     internal class UtcToLocalTimeConverter : IValueConverter
     {

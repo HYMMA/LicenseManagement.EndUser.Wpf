@@ -1,4 +1,4 @@
-﻿namespace Hymma.Lm.EndUser.Wpf.Properties {
+namespace LicenseManagement.EndUser.Wpf.Properties {
     
     
     // This class allows you to handle specific events on the settings class:

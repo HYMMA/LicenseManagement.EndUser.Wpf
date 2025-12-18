@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Windows.Input;
 
-namespace Hymma.Lm.EndUser.Wpf.Commands
+namespace LicenseManagement.EndUser.Wpf.Commands
 {
     internal class RelayCommand : ICommand
     {

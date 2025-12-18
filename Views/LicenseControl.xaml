@@ -1,21 +1,17 @@
-<Window x:Class="LicenseManagement.EndUser.Wpf.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:core="clr-namespace:System;assembly=mscorlib"
-        mc:Ignorable="d"
-        xmlns:viewModles='clr-namespace:LicenseManagement.EndUser.Wpf.ViewModels'
-        xmlns:converters='clr-namespace:LicenseManagement.EndUser.Wpf.Converters'
-        DataContext='{Binding RelativeSource={RelativeSource Mode=Self}, Path=License}'
-        Loaded='thisView_Loaded'
-        Title="License"
-        Height="auto"
-        Width="700"
-        SizeToContent='Height'
-        Name='thisView'>
-  <Window.Resources>
-    <viewModles:LicenseViewModel x:Key='License' />
+<UserControl x:Class="LicenseManagement.EndUser.Wpf.Views.LicenseControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:core="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d"
+             xmlns:viewModels='clr-namespace:LicenseManagement.EndUser.Wpf.ViewModels'
+             xmlns:converters='clr-namespace:LicenseManagement.EndUser.Wpf.Converters'
+             DataContext='{Binding RelativeSource={RelativeSource Mode=Self}, Path=License}'
+             Loaded='Control_Loaded'
+             Name='thisControl'>
+  <UserControl.Resources>
+    <viewModels:LicenseViewModel x:Key='License' />
     <converters:LicenseStatusConverter x:Key='LicenseStatusConverter' />
     <converters:LicenseStatusVisibilityConverter x:Key='LicenseStatusVisibilityConverter' />
     <converters:UnregisterVisibilityConverter x:Key='UnregisterVisibilityConverter' />
@@ -79,11 +75,11 @@
       <Setter Property='TextElement.Foreground'
               Value='Gray' />
     </Style>
-    <Style TargetType='StackPanel'>
+    <Style x:Key='controlStackPanel' TargetType='StackPanel'>
       <Setter Property='Margin'
               Value='{StaticResource m5}'></Setter>
     </Style>
-    <Style TargetType='TextBox'>
+    <Style x:Key='controlTextBox' TargetType='TextBox'>
       <Style.Resources>
         <Style TargetType='Border'>
           <Setter Property='CornerRadius'
@@ -93,7 +89,7 @@
         </Style>
       </Style.Resources>
     </Style>
-    <Style TargetType='Label'>
+    <Style x:Key='controlLabel' TargetType='Label'>
       <Style.Resources>
         <Style TargetType='Border'>
           <Setter Property='CornerRadius'
@@ -103,7 +99,7 @@
         </Style>
       </Style.Resources>
     </Style>
-    <Style TargetType="Button">
+    <Style x:Key='controlButton' TargetType="Button">
       <Setter Property='Padding'
               Value='6' />
       <Setter Property='Cursor'
@@ -124,20 +120,19 @@
         <AdornedElementPlaceholder />
       </StackPanel>
     </ControlTemplate>
-  </Window.Resources>
+  </UserControl.Resources>
   <StackPanel>
-    <StackPanel Orientation='Horizontal'>
-      <StackPanel Orientation='Horizontal'>
+    <StackPanel Orientation='Horizontal' Style='{StaticResource controlStackPanel}'>
+      <StackPanel Orientation='Horizontal' Style='{StaticResource controlStackPanel}'>
         <Image Source='{DynamicResource license}'
                Name='licenseImage'
                Width='50'
                VerticalAlignment='Top'
                HorizontalAlignment='Right' />
       </StackPanel>
-      <StackPanel Orientation='Vertical'>
+      <StackPanel Orientation='Vertical' Style='{StaticResource controlStackPanel}'>
         <!--Status-->
-        <StackPanel Orientation='Horizontal'>
-          <!--<Label Content='Status '/>-->
+        <StackPanel Orientation='Horizontal' Style='{StaticResource controlStackPanel}'>
           <Label BorderThickness='.5'
                  BorderBrush='{Binding Path=Status, Converter={StaticResource LicenseStatusBorderConverter}}'
                  Foreground='{Binding Path=Status, Converter={StaticResource LicenseStatusBorderConverter}}'
@@ -145,25 +140,25 @@
                  Background='{Binding Path=Status, Converter={StaticResource LicenseStatusBgConverter}}'
                  Style='{StaticResource  ResourceKey=boldText}' />
         </StackPanel>
-        <StackPanel Margin='0'
+        <StackPanel Margin='0' Style='{StaticResource controlStackPanel}'
                     Visibility='{Binding Path=Status, Converter={StaticResource SubscriptionVisibilityConverter}}'>
           <!--customer email-->
-          <StackPanel Orientation='Horizontal'>
+          <StackPanel Orientation='Horizontal' Style='{StaticResource controlStackPanel}'>
             <Label Content='The subscription is purchased by '
                    Style='{StaticResource  ResourceKey=grayText}' />
             <Label Content='{Binding  Path=CustomerEmail}'
                    Style='{StaticResource  ResourceKey=boldText}' />
           </StackPanel>
           <!--Sub expiry date-->
-          <StackPanel Orientation='Horizontal'>
-            <Label Content='Subsription expires on: '
+          <StackPanel Orientation='Horizontal' Style='{StaticResource controlStackPanel}'>
+            <Label Content='Subscription expires on: '
                    Style='{StaticResource  ResourceKey=grayText}' />
             <Label Content='{Binding Path=ReceiptExpires,Converter={StaticResource UtcToLocalTimeConverter}}'
                    Style='{StaticResource  ResourceKey=boldText}' />
           </StackPanel>
         </StackPanel>
         <!--Trial expiry date-->
-        <StackPanel Orientation='Horizontal'
+        <StackPanel Orientation='Horizontal' Style='{StaticResource controlStackPanel}'
                     Visibility='{Binding Path=Status, Converter={StaticResource TrialVisibilityConverter}}'>
           <Label Content='Trial expires on: '
                  Style='{StaticResource  ResourceKey=grayText}' />
@@ -171,14 +166,14 @@
                  Style='{StaticResource  ResourceKey=boldText}' />
         </StackPanel>
         <!--lic file expiry date-->
-        <StackPanel Orientation='Horizontal'>
+        <StackPanel Orientation='Horizontal' Style='{StaticResource controlStackPanel}'>
           <Label Content='License file expires on: '
                  Style='{StaticResource  ResourceKey=grayText}' />
           <Label Content='{Binding Path=Expires,Converter= {StaticResource UtcToLocalTimeConverter}}'
                  Style='{StaticResource  ResourceKey=boldText}' />
         </StackPanel>
         <!--computer name-->
-        <StackPanel Orientation='Horizontal'>
+        <StackPanel Orientation='Horizontal' Style='{StaticResource controlStackPanel}'>
           <Label Content='Computer: '
                  Style='{StaticResource  ResourceKey=grayText}' />
           <Label Content='{Binding  Path=ComputerName}'
@@ -186,11 +181,11 @@
         </StackPanel>
         <!--Product name-->
         <!--Products dropdown -->
-        <StackPanel Orientation='Horizontal'>
+        <StackPanel Orientation='Horizontal' Style='{StaticResource controlStackPanel}'>
           <Label Content='Product: '
                  Style='{StaticResource ResourceKey=grayText}' />
           <ComboBox ItemsSource='{Binding Path=Products }'
-                    SelectionChanged='OnProductsSlectionChanged'
+                    SelectionChanged='OnProductsSelectionChanged'
                     x:Name='productsComboBox'
                     SelectedItem='{Binding Product }'>
             <ComboBox.ItemTemplate>
@@ -202,35 +197,38 @@
           </ComboBox>
         </StackPanel>
         <!--Vendor-->
-        <StackPanel Orientation='Horizontal'>
+        <StackPanel Orientation='Horizontal' Style='{StaticResource controlStackPanel}'>
           <Label Content='Vendor: '
                  Style='{StaticResource  ResourceKey=grayText}' />
           <Label Content='{Binding Path=VendorName}'
                  Style='{StaticResource  ResourceKey=boldText}' />
         </StackPanel>
         <!--Unregister-->
-        <StackPanel Orientation='Horizontal'
+        <StackPanel Orientation='Horizontal' Style='{StaticResource controlStackPanel}'
                     Visibility='{Binding Path=Status, Converter={StaticResource UnregisterVisibilityConverter}}'>
           <Button Content='Unregister'
-                  CommandParameter='{x:Reference Name=thisView}'
+                  Style='{StaticResource controlButton}'
+                  CommandParameter='{x:Reference Name=thisControl}'
                   Command='{Binding ShowUnregisterView}' />
         </StackPanel>
-        <!--Renew Licnese-->
-        <StackPanel Orientation='Horizontal'
+        <!--Renew License-->
+        <StackPanel Orientation='Horizontal' Style='{StaticResource controlStackPanel}'
                     Visibility='{Binding Path=Status, Converter={StaticResource RenewLicenseVisibilityConverter}}'>
           <Button Content='Download new file'
-                  CommandParameter='{x:Reference Name=thisView}'
+                  Style='{StaticResource controlButton}'
+                  CommandParameter='{x:Reference Name=thisControl}'
                   Command='{Binding Path=RenewLicenseFile}' />
         </StackPanel>
         <!--product key-->
-        <StackPanel Orientation='Horizontal'>
+        <StackPanel Orientation='Horizontal' Style='{StaticResource controlStackPanel}'>
           <Button  Visibility='{Binding Path=Status, Converter={StaticResource LicenseStatusVisibilityConverter} }'
+                   Style='{StaticResource controlButton}'
                    Command='{Binding ShowRegisterView}'
-                   CommandParameter='{x:Reference Name=thisView}'>Register</Button>
+                   CommandParameter='{x:Reference Name=thisControl}'>Register</Button>
         </StackPanel>
       </StackPanel>
     </StackPanel>
-    <StackPanel Orientation='Horizontal'>
+    <StackPanel Orientation='Horizontal' Style='{StaticResource controlStackPanel}'>
       <Label Style='{StaticResource ResourceKey=grayText}'
              FontSize='10'
              Content='Powered by '></Label>
@@ -240,4 +238,4 @@
              Content='License-management.com'></Label>
     </StackPanel>
   </StackPanel>
-</Window>
+</UserControl>

@@ -2,7 +2,7 @@
 // WPF Sample Application for License Management
 // =============================================================================
 // This sample demonstrates how to integrate license management into a WPF
-// application using the Hymma.Lm.EndUser.Wpf package.
+// application using the LicenseManagement.EndUser.Wpf package.
 //
 // Features demonstrated:
 // - License validation at startup
@@ -11,11 +11,11 @@
 // - Feature gating based on license status
 // =============================================================================
 
-using Hymma.Lm.EndUser;
-using Hymma.Lm.EndUser.License;
-using Hymma.Lm.EndUser.Models;
-using Hymma.Lm.EndUser.Wpf.ViewModels;
-using Hymma.Lm.EndUser.Wpf.Views;
+using LicenseManagement.EndUser;
+using LicenseManagement.EndUser.License;
+using LicenseManagement.EndUser.Models;
+using LicenseManagement.EndUser.Wpf.ViewModels;
+using LicenseManagement.EndUser.Wpf.Views;
 using LicenseManagement.Sample.Wpf.Services;
 using System;
 using System.Collections.ObjectModel;
@@ -243,8 +243,8 @@ namespace LicenseManagement.Sample.Wpf
             // Create license view model from the current context
             var licenseViewModel = LicenseViewModel.FromContext(_currentContext, products);
 
-            // Show the built-in license management window from the Hymma package
-            var licenseWindow = new Hymma.Lm.EndUser.Wpf.Views.MainWindow
+            // Show the built-in license management window from the LicenseManagement package
+            var licenseWindow = new LicenseManagement.EndUser.Wpf.Views.MainWindow
             {
                 Owner = this,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,

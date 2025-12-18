@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{E540C8A3-5609-42B4-BD96-56AFE71B4DE5}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Hymma.Lm.EndUser.Wpf</RootNamespace>
-    <AssemblyName>Hymma.Lm.EndUser.Wpf</AssemblyName>
+    <RootNamespace>LicenseManagement.EndUser.Wpf</RootNamespace>
+    <AssemblyName>LicenseManagement.EndUser.Wpf</AssemblyName>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <WarningLevel>4</WarningLevel>
@@ -81,6 +81,9 @@
     <Compile Include="Views\UnregisterView.xaml.cs">
       <DependentUpon>UnregisterView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\LicenseControl.xaml.cs">
+      <DependentUpon>LicenseControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\ValueConverters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\ValueConverters\LicenseStatusConverter.cs" />
     <Compile Include="Window1.xaml.cs">
@@ -103,6 +106,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\UnregisterView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\LicenseControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -140,16 +147,16 @@
     <Resource Include="padlock.ico" />
   </ItemGroup>
   <!-- Local development: use project reference -->
-  <ItemGroup Condition="Exists('..\Hymma.LM\LicenseManagement.EndUser\LicenseManagement.EndUser\LicenseManagement.EndUser.csproj')">
-    <ProjectReference Include="..\Hymma.LM\LicenseManagement.EndUser\LicenseManagement.EndUser\LicenseManagement.EndUser.csproj">
+  <ItemGroup Condition="Exists('..\LicenseManagement.EndUser\LicenseManagement.EndUser\LicenseManagement.EndUser.csproj')">
+    <ProjectReference Include="..\LicenseManagement.EndUser\LicenseManagement.EndUser\LicenseManagement.EndUser.csproj">
       <Project>{ae18bd8e-bffe-4ba1-8e65-f4b0accb54bf}</Project>
       <Name>LicenseManagement.EndUser</Name>
     </ProjectReference>
   </ItemGroup>
   <!-- CI/CD: use NuGet package reference -->
-  <ItemGroup Condition="!Exists('..\Hymma.LM\LicenseManagement.EndUser\LicenseManagement.EndUser\LicenseManagement.EndUser.csproj')">
-    <Reference Include="Hymma.Lm.EndUser">
-      <HintPath>packages\Hymma.Lm.EndUser.1.2.0\lib\net481\Hymma.Lm.EndUser.dll</HintPath>
+  <ItemGroup Condition="!Exists('..\LicenseManagement.EndUser\LicenseManagement.EndUser\LicenseManagement.EndUser.csproj')">
+    <Reference Include="LicenseManagement.EndUser">
+      <HintPath>packages\LicenseManagement.EndUser.2.0.0\lib\net481\LicenseManagement.EndUser.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

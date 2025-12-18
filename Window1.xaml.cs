@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Windows;
 
-namespace Hymma.Lm.EndUser.Wpf
+namespace LicenseManagement.EndUser.Wpf
 {
     /// <summary>
     /// Interaction logic for Window1.xaml
