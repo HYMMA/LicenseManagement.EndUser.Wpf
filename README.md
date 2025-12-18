@@ -287,6 +287,7 @@ MIT - See [LICENSE](LICENSE) for details.
 ## Related Packages
 
 - [LicenseManagement.EndUser](https://www.nuget.org/packages/LicenseManagement.EndUser) - Core end-user SDK (includes [WiX Custom Action sample](https://github.com/HYMMA/LicenseManagement.EndUser/tree/master/samples/WixCustomAction))
+- [LicenseManagement.EndUser.Avalonia](https://www.nuget.org/packages/LicenseManagement.EndUser.Avalonia) - Avalonia UI version (cross-platform)
 - [LicenseManagement.Client](https://www.nuget.org/packages/LicenseManagement.Client) - Server-side SDK for vendors
 
 ## Documentation
