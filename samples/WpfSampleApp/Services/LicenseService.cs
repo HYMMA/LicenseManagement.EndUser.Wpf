@@ -57,11 +57,6 @@ namespace LicenseManagement.Sample.Wpf.Services
         </RSAKeyValue>";
 
         /// <summary>
-        /// Trial period in days. Set to your desired trial length.
-        /// </summary>
-        private const uint TrialDays = 14;
-
-        /// <summary>
         /// License validity period in days.
         /// The license file is valid for this many days before requiring re-validation.
         /// </summary>
@@ -200,10 +195,11 @@ namespace LicenseManagement.Sample.Wpf.Services
         /// </summary>
         public int GetTrialDaysRemaining()
         {
-            if (_cachedContext?.LicenseModel?.TrialEndDate == null)
+            var trialEndDate = _cachedContext?.LicenseModel?.TrialEndDate;
+            if (!trialEndDate.HasValue || trialEndDate == default)
                 return 0;
 
-            var remaining = (_cachedContext.LicenseModel.TrialEndDate.Value - DateTime.UtcNow).Days;
+            var remaining = (trialEndDate.Value - DateTime.UtcNow).Days;
             return Math.Max(0, remaining);
         }
     }

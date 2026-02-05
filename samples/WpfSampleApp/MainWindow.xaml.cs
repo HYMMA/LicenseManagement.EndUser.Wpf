@@ -156,10 +156,10 @@ namespace LicenseManagement.Sample.Wpf
         /// </summary>
         private int GetTrialDaysRemaining(LicenseModel license)
         {
-            if (license.TrialEndDate == null)
+            if (license.TrialEndDate == default)
                 return 0;
 
-            var remaining = (license.TrialEndDate.Value - DateTime.UtcNow).Days;
+            var remaining = (license.TrialEndDate - DateTime.UtcNow).Days;
             return Math.Max(0, remaining);
         }
 
