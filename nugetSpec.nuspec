@@ -2,7 +2,7 @@
 <package>
 	<metadata minClientVersion="2.5">
 		<id>LicenseManagement.EndUser.Wpf</id>
-		<version>2.1.0</version>
+		<version>2.1.1</version>
 		<authors>HYMMA</authors>
 		<owners>HYMMA</owners>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -20,7 +20,7 @@
 		<file src="bin\Release\LicenseManagement.EndUser.Wpf.dll" target="lib\net481" />
 		<file src="bin\Release\LicenseManagement.EndUser.Wpf.pdb" target="lib\net481" />
 		<!-- Bundled dependencies from EndUser package -->
-		<file src="packages\LicenseManagement.EndUser.3.0.1\lib\net481\LicenseManagement.EndUser.dll" target="lib\net481" />
+		<file src="packages\LicenseManagement.EndUser.3.0.2\lib\net481\LicenseManagement.EndUser.dll" target="lib\net481" />
 		<!-- Bundled dependencies from other packages -->
 		<file src="packages\Hymma.HttpClientFactory.1.0.8\lib\net45\Hymma.HttpClientFactory.dll" target="lib\net481" />
 		<file src="packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll" target="lib\net481" />
