@@ -39,7 +39,7 @@
     <AssemblyOriginatorKeyFile>Enduser.wpf.snk</AssemblyOriginatorKeyFile>
     <!-- Single source of truth for the LicenseManagement.EndUser dependency version.
          The packages.config entry and the workflow inputs must match this value. -->
-    <LicenseEndUserVersion>2.0.1</LicenseEndUserVersion>
+    <LicenseEndUserVersion>3.0.1</LicenseEndUserVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

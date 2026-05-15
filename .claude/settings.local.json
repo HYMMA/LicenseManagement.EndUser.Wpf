@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__csharp__csharp_set_workspace",
+      "mcp__csharp__xaml_validate",
+      "mcp__csharp__csharp_diagnostics",
+      "mcp__csharp__csharp_stop"
+    ]
+  }
+}

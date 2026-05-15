@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net481</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <!--
+      The WPF library (old-style .csproj + XAML) cannot be compiled by dotnet-build because
+      XAML compilation requires MSBuild WPF targets. Build the library first with:
+        MSBuild.exe LicenseManagement.EndUser.Wpf.csproj /p:Configuration=Release
+      then run tests with: dotnet test Tests\LicenseManagement.EndUser.Wpf.Tests
+    -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WPF framework assemblies needed by the library under test -->
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reference the pre-built library DLL directly (avoids XAML compilation via dotnet-build) -->
+    <Reference Include="LicenseManagement.EndUser.Wpf">
+      <HintPath>..\..\bin\Release\LicenseManagement.EndUser.Wpf.dll</HintPath>
+    </Reference>
+    <!-- Transitive dependency — bundles DeviceId + other EndUser deps via ILRepack -->
+    <Reference Include="LicenseManagement.EndUser">
+      <HintPath>..\..\bin\Release\LicenseManagement.EndUser.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\bin\Release\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Hymma.HttpClientFactory">
+      <HintPath>..\..\bin\Release\Hymma.HttpClientFactory.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+</Project>

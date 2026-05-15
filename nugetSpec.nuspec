@@ -2,13 +2,13 @@
 <package>
 	<metadata minClientVersion="2.5">
 		<id>LicenseManagement.EndUser.Wpf</id>
-		<version>2.0.2</version>
+		<version>2.1.0</version>
 		<authors>HYMMA</authors>
 		<owners>HYMMA</owners>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<license type="expression">MIT</license>
 		<description>WPF UI components for license-management.com end-user SDK. Provides ready-to-use Window and UserControl components, view models, and converters for license registration and management workflows. Bundles all required dependencies for easy deployment.</description>
-		<releaseNotes>Audit follow-up: fixes RelayCommand CanExecuteChanged wiring, ProductViewModel property change notifications, MainWindow null-ref on missing Products section. Adds IsBusy gating to prevent double-submission on Register/Unregister, narrow SDK exception handling with trace logging, and centralises ApiKey storage off the bindable property surface. XAML resources deduplicated into the shared AppResources.xaml; library-poisoning implicit styles converted to keyed styles. Sample app now loads credentials from App.config.</releaseNotes>
+		<releaseNotes>2.1.0: Bumps dependency to LicenseManagement.EndUser 3.0.1 (tamper detection fix, uninstall reads from disk). Adds unit test project for ViewModels.</releaseNotes>
 		<projectUrl>https://github.com/HYMMA/LicenseManagement.EndUser.Wpf</projectUrl>
 		<repository type="git" url="https://github.com/HYMMA/LicenseManagement.EndUser.Wpf.git" />
 		<readme>README.md</readme>
@@ -20,7 +20,7 @@
 		<file src="bin\Release\LicenseManagement.EndUser.Wpf.dll" target="lib\net481" />
 		<file src="bin\Release\LicenseManagement.EndUser.Wpf.pdb" target="lib\net481" />
 		<!-- Bundled dependencies from EndUser package -->
-		<file src="packages\LicenseManagement.EndUser.2.0.1\lib\net481\LicenseManagement.EndUser.dll" target="lib\net481" />
+		<file src="packages\LicenseManagement.EndUser.3.0.1\lib\net481\LicenseManagement.EndUser.dll" target="lib\net481" />
 		<!-- Bundled dependencies from other packages -->
 		<file src="packages\Hymma.HttpClientFactory.1.0.8\lib\net45\Hymma.HttpClientFactory.dll" target="lib\net481" />
 		<file src="packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll" target="lib\net481" />

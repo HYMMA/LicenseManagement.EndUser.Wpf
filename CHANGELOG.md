@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-05-15
+
+### Changed
+- Bumped `LicenseManagement.EndUser` dependency from 2.0.1 to 3.0.1 to pick up tamper-detection
+  fix in `LicenseSignatureValidationHandler` and the uninstall disk-read fix.
+
+### Added
+- Unit test project (`Tests/LicenseManagement.EndUser.Wpf.Tests`) covering `LicenseViewModel` and
+  `ProductViewModel` property change notifications. Run with `dotnet test` after building the
+  library with MSBuild (XAML compilation requires the full MSBuild WPF targets).
+
 ## [2.0.2] - 2026-05-15
 
 ### Fixed
