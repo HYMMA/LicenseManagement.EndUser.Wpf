@@ -57,11 +57,20 @@
     <Setter Property='TextElement.Foreground'
             Value='Gray' />
   </Style>
-  <Style TargetType='StackPanel'>
+  <!--
+    All TargetType-only styles below are KEYED so that when a host application
+    merges this dictionary into its own App.Resources it does NOT mutate every
+    StackPanel / Button / TextBox / Label in the host app. Library views opt-in
+    via either Style="{StaticResource controlButton}" or a local implicit
+    `<Style TargetType="Button" BasedOn="{StaticResource controlButton}" />`.
+  -->
+  <Style x:Key='controlStackPanel'
+         TargetType='StackPanel'>
     <Setter Property='Margin'
-            Value='{StaticResource m5}'></Setter>
+            Value='{StaticResource m5}' />
   </Style>
-  <Style TargetType='TextBox'>
+  <Style x:Key='controlTextBox'
+         TargetType='TextBox'>
     <Style.Resources>
       <Style TargetType='Border'>
         <Setter Property='CornerRadius'
@@ -71,7 +80,8 @@
       </Style>
     </Style.Resources>
   </Style>
-  <Style TargetType='Label'>
+  <Style x:Key='controlLabel'
+         TargetType='Label'>
     <Style.Resources>
       <Style TargetType='Border'>
         <Setter Property='CornerRadius'
@@ -81,7 +91,8 @@
       </Style>
     </Style.Resources>
   </Style>
-  <Style TargetType="Button">
+  <Style x:Key='controlButton'
+         TargetType='Button'>
     <Setter Property='Padding'
             Value='6' />
     <Setter Property='Cursor'
@@ -93,7 +104,7 @@
     <Style.Resources>
       <Style TargetType='Border'>
         <Setter Property='CornerRadius'
-                Value='5'></Setter>
+                Value='5' />
       </Style>
     </Style.Resources>
   </Style>

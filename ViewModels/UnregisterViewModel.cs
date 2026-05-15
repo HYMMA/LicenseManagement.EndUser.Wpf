@@ -1,49 +1,67 @@
 using LicenseManagement.EndUser.Wpf.Commands;
+using LicenseManagement.EndUser.Wpf.Configuration;
 using LicenseManagement.EndUser.Wpf.Views;
-using System;
-using System.Collections.ObjectModel;
-using System.Security;
-using System.Security.Cryptography.X509Certificates;
+using System.ComponentModel;
 using System.Windows.Input;
+using System.Xml.Serialization;
 
 namespace LicenseManagement.EndUser.Wpf.ViewModels
 {
     public class UnregisterViewModel : BaseViewModel
     {
-        public ICommand Unregister => new RelayCommand(UnregisterLicense, CanUnregisterLicense);
+        private string _apiKey;
+        private bool _isBusy;
+        private readonly RelayCommand _unregister;
+
+        public UnregisterViewModel()
+        {
+            _unregister = new RelayCommand(UnregisterLicense, _ => !IsBusy && _apiKey != null);
+        }
+
+        public ICommand Unregister => _unregister;
 
         public string VendorId { get; internal set; }
         public string ProductId { get; internal set; }
-        public string ApiKey { get; internal set; }
         public string PublicKey { get; internal set; }
+
+        [XmlIgnore]
+        [Browsable(false)]
+        internal string ApiKey => _apiKey;
+
+        public void SetApiKey(string value) => _apiKey = value;
+
+        public bool IsBusy
+        {
+            get => _isBusy;
+            private set
+            {
+                if (_isBusy != value)
+                {
+                    _isBusy = value;
+                    OnPropertyChanged();
+                    _unregister.RaiseCanExecuteChanged();
+                }
+            }
+        }
 
         private void UnregisterLicense(object obj)
         {
             var view = obj as UnregisterView;
-            var pref = new PublisherPreferences(VendorId, ProductId, ApiKey) { PublicKey = PublicKey };
-            var context = new LicHandlingContext(pref);
-            var handler = new LicenseHandlingUninstall(
-                context: context,
-                OnLicenseHandledSuccessfully: (c) =>
-            {
-                //view.Owner.DataContext = LicenseViewModel.FromContext(context, Products);
-                view.Close();
-            });
+            if (view == null) return;
+
+            IsBusy = true;
             try
             {
-                handler.HandleLicense();
+                var pref = PublisherPreferencesFactory.Build(VendorId, ProductId, _apiKey, PublicKey, validDays: 0);
+                var context = new LicHandlingContext(pref);
+                var handler = new LicenseHandlingUninstall(context, OnLicenseHandledSuccessfully: _ => view.Close());
+
+                LicenseOperationRunner.Run(handler, ex => ShowErrorView(view, ex));
             }
-            catch (Exception e)
+            finally
             {
-                ShowErrorView(obj as UnregisterView, e);
+                IsBusy = false;
             }
         }
-
-        private bool CanCallApi() =>
-            ApiKey != null;
-
-
-        private bool CanUnregisterLicense(object obj) =>
-            CanCallApi();
     }
 }

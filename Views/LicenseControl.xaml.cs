@@ -1,9 +1,6 @@
+using LicenseManagement.EndUser.Wpf.Configuration;
 using LicenseManagement.EndUser.Wpf.ViewModels;
 using System;
-using System.Collections.Specialized;
-using System.Configuration;
-using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -30,71 +27,25 @@ namespace LicenseManagement.EndUser.Wpf.Views
         }
 
         #region dependency property set up
-        public static DependencyProperty LicenseProperty { get; }
+        public static readonly DependencyProperty LicenseProperty =
+            DependencyProperty.Register(
+                nameof(License),
+                typeof(LicenseViewModel),
+                typeof(LicenseControl),
+                new PropertyMetadata(LicenseConfigurationLoader.TryLoad(), OnLicenseChanged));
 
         /// <summary>
-        /// CLR wrapper for dependency property
+        /// CLR wrapper for the License dependency property.
         /// </summary>
         public LicenseViewModel License
         {
-            get => GetValue(LicenseProperty) as LicenseViewModel;
+            get => (LicenseViewModel)GetValue(LicenseProperty);
             set => SetValue(LicenseProperty, value);
         }
 
-        public static void LicenseChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void OnLicenseChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var control = sender as LicenseControl;
-            control.License = e.NewValue as LicenseViewModel;
-        }
-
-        public virtual void OnLicenseChanged(DependencyPropertyChangedEventArgs e)
-        {
-            var newVal = e.NewValue as LicenseViewModel;
-        }
-
-        public static PropertyMetadata Meta
-        {
-            get
-            {
-                if (ConfigurationManager.AppSettings.Count != 0)
-                {
-                    if (!uint.TryParse(ConfigurationManager.AppSettings.Get("validDays"), out uint valid))
-                        valid = 90;
-
-                    var defaultValue = new LicenseViewModel()
-                    {
-                        Expires = DateTime.Now,
-                        ValidDays = valid,
-                        VendorId = ConfigurationManager.AppSettings.Get("vendorId") ?? "",
-                        PublicKey = ConfigurationManager.AppSettings.Get("publicKey") ?? "",
-                        ApiKey = ConfigurationManager.AppSettings.Get("ApiKey") ?? "",
-                    };
-                    var ps = (NameValueCollection)ConfigurationManager.GetSection("Products");
-                    defaultValue.Products = new System.Collections.ObjectModel.ObservableCollection<ProductViewModel>();
-                    if (ps != null)
-                    {
-                        foreach (var item in ps.AllKeys)
-                        {
-                            defaultValue.Products.Add(new ProductViewModel { Id = item, Name = ps[item] });
-                        }
-                    }
-                    defaultValue.Product = defaultValue.Products.FirstOrDefault();
-                    var model = new PropertyMetadata(defaultValue, propertyChangedCallback: LicenseChanged);
-                    return model;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
-        static LicenseControl()
-        {
-            LicenseProperty = DependencyProperty.Register(nameof(License),
-                typeof(LicenseViewModel),
-                ownerType: typeof(LicenseControl),
-                typeMetadata: Meta);
+            // dependency property already stores the new value; nothing extra to do
         }
         #endregion
 
@@ -102,22 +53,26 @@ namespace LicenseManagement.EndUser.Wpf.Views
         {
             if (e.AddedItems.Count > 0)
             {
-                var newSelection = e.AddedItems[0] as ProductViewModel;
                 License?.CheckLiceneFile(this);
             }
         }
 
         private void Control_Loaded(object sender, RoutedEventArgs e)
         {
-            productsComboBox.SelectedIndex = 0;
+            Loaded -= Control_Loaded;
 
-            if (Application.ResourceAssembly == null)
-            {
-                Application.ResourceAssembly = Assembly.GetExecutingAssembly();
-            }
+            if (productsComboBox.Items.Count > 0)
+                productsComboBox.SelectedIndex = 0;
+
             if (licenseImage.Source == null)
             {
-                licenseImage.Source = new BitmapImage(new Uri("pack://application:,,,/LicenseManagement.EndUser.Wpf;component/Assets/license.png", UriKind.Absolute));
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri("pack://application:,,,/LicenseManagement.EndUser.Wpf;component/Assets/license.png", UriKind.Absolute);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+                bitmap.Freeze();
+                licenseImage.Source = bitmap;
             }
         }
     }

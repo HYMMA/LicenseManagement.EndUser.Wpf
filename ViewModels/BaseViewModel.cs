@@ -8,15 +8,16 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
 {
     public class BaseViewModel : INotifyPropertyChanged
     {
-        DateTime? _updated;
-        DateTime? _created;
+        private DateTime? _updated;
+        private DateTime? _created;
 
         /// <summary>
         /// the date this object was first created in db
         /// </summary>
         public virtual DateTime? Created
         {
-            get => _created; set
+            get => _created;
+            set
             {
                 if (_created != value)
                 {
@@ -31,7 +32,8 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
         /// </summary>
         public virtual DateTime? Updated
         {
-            get => _updated; set
+            get => _updated;
+            set
             {
                 if (_updated != value)
                 {
@@ -41,15 +43,21 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
             }
         }
 
-        protected void ShowErrorView(Window obj, Exception exception)
+        /// <summary>
+        /// Resolves the owning <see cref="Window"/> for the given source (which may be
+        /// a Window, a UserControl, or null) and shows an error dialog for the
+        /// supplied exception. No-op if no owner can be resolved.
+        /// </summary>
+        protected void ShowErrorView(DependencyObject source, Exception exception)
         {
-            if (!obj.IsActive)
-            {
-                return;
-            }
+            if (exception == null) return;
+
+            var owner = source is Window w ? w : (source != null ? Window.GetWindow(source) : null);
+            if (owner == null || !owner.IsActive) return;
+
             var view = new ErrorView
             {
-                Owner = obj,
+                Owner = owner,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 DataContext = exception
             };
@@ -58,9 +66,6 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-
-        // Create the OnPropertyChanged method to raise the event
-        // The calling member's name will be used as the parameter.
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

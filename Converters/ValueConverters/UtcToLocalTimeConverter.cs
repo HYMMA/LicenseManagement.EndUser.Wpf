@@ -10,18 +10,17 @@ namespace LicenseManagement.EndUser.Wpf.Converters
         {
             if (value is DateTime date)
             {
-                return date.ToLocalTime().ToString(CultureInfo.CurrentCulture);
+                // XML-serialised DateTime arrives with Kind=Unspecified; treat it as UTC
+                // (server timestamps are always UTC) before converting to local time.
+                var utc = date.Kind == DateTimeKind.Unspecified
+                    ? DateTime.SpecifyKind(date, DateTimeKind.Utc)
+                    : date;
+                return utc.ToLocalTime().ToString(culture ?? CultureInfo.CurrentCulture);
             }
-            else
-            {
-                return null;
-            }
-            //return DateTime.SpecifyKind(DateTime.Parse(value as string), DateTimeKind.Utc).ToLocalTime();
+            return null;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+            throw new NotSupportedException();
     }
 }

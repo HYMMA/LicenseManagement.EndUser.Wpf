@@ -1,42 +1,38 @@
 using LicenseManagement.EndUser.Models;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LicenseManagement.EndUser.Wpf.ViewModels
 {
     public class ProductViewModel : BaseViewModel
     {
-        public static ProductViewModel FromProductModel(Models.ProductModel model)
+        public static ProductViewModel FromProductModel(ProductModel model)
         {
-            if (model ==null)
+            if (model == null)
                 return null;
-            
-            var p = new ProductViewModel
+
+            return new ProductViewModel
             {
                 Id = model.Id,
                 Name = model.Name,
                 Created = model.Created,
                 Updated = model.Updated
             };
-            return p;
         }
 
-        string _id;
-        string _name;
+        private string _id;
+        private string _name;
+
         /// <summary>
         /// this is actually the Ulid of the product with prefix PRD_
         /// </summary>
         public string Id
         {
-            get => _id; set
+            get => _id;
+            set
             {
                 if (_id != value)
                 {
                     _id = value;
+                    OnPropertyChanged();
                 }
             }
         }
@@ -46,17 +42,15 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
         /// </summary>
         public string Name
         {
-            get => _name; set
+            get => _name;
+            set
             {
                 if (_name != value)
                 {
                     _name = value;
+                    OnPropertyChanged();
                 }
             }
         }
-        //public override string ToString()
-        //{
-        //    return Id + Name; 
-        //}
     }
 }

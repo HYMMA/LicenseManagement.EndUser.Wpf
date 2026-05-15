@@ -1,99 +1,96 @@
-using LicenseManagement.EndUser.Models;
 using LicenseManagement.EndUser.Wpf.Commands;
+using LicenseManagement.EndUser.Wpf.Configuration;
 using LicenseManagement.EndUser.Wpf.Views;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 using System.Windows.Input;
+using System.Xml.Serialization;
 
 namespace LicenseManagement.EndUser.Wpf.ViewModels
 {
     internal class RegisterLicenseViewModel : BaseViewModel
     {
         private string _code;
+        private string _apiKey;
+        private bool _isBusy;
+        private readonly RelayCommand _register;
+
+        public RegisterLicenseViewModel()
+        {
+            _register = new RelayCommand(RegisterAction, _ => !IsBusy && !string.IsNullOrEmpty(ReceiptCode) && _apiKey != null);
+        }
 
         public string PublicKey { get; set; }
+
         public string ReceiptCode
         {
-            get => _code; set
+            get => _code;
+            set
             {
                 if (_code != value)
                 {
                     _code = value;
                     OnPropertyChanged();
-
+                    _register.RaiseCanExecuteChanged();
                 }
             }
         }
 
-        internal string ApiKey { get; set; }
+        [XmlIgnore]
+        [Browsable(false)]
+        internal string ApiKey => _apiKey;
 
-        public ICommand Register => new RelayCommand(RegisterAction, CanRegisterNewLicense);
+        public void SetApiKey(string value) => _apiKey = value;
+
+        public ICommand Register => _register;
 
         internal string VendorId { get; set; }
         internal string ProductId { get; set; }
         public uint ValidDays { get; set; }
 
-        private bool CanRegisterNewLicense(object obj) =>
-            CanCallApi();
-
-        private bool CanCallApi() =>
-            ApiKey != null;
+        public bool IsBusy
+        {
+            get => _isBusy;
+            private set
+            {
+                if (_isBusy != value)
+                {
+                    _isBusy = value;
+                    OnPropertyChanged();
+                    _register.RaiseCanExecuteChanged();
+                }
+            }
+        }
 
         private void RegisterAction(object obj)
         {
             var view = obj as RegisterLicenseView;
-            if (string.IsNullOrEmpty(view.receiptCode.Text))
+            if (view == null || string.IsNullOrEmpty(ReceiptCode))
                 return;
-            var pref = new PublisherPreferences(VendorId, ProductId, ApiKey)
-            {
-                PublicKey = this.PublicKey,
-                ValidDays = this.ValidDays,
-            };
-            var context = new LicHandlingContext(pref);
-            var handler = new LicenseHandlingLaunch(context,
-                                                    OnCustomerMustEnterProductKey: GetNewReceiptCode,
-                                                    OnLicFileNotFound: GetNewLicFile,
-                                                    OnTrialEnded: ChangeDefaultTrail,
-                                                    OnComputerUnregistered: ComputerUnregistered,
-                                                    OnTrialValidated: GetNewReceiptCode,
-                                                    OnLicenseHandledSuccessfully: (l) =>
-                                                    {
-                                                        view.Close();
-                                                    });
+
+            IsBusy = true;
             try
             {
-                handler.HandleLicense();
+                var pref = PublisherPreferencesFactory.Build(VendorId, ProductId, _apiKey, PublicKey, ValidDays);
+                var context = new LicHandlingContext(pref);
+                var handler = new LicenseHandlingLaunch(
+                    context,
+                    OnCustomerMustEnterProductKey: () => ReceiptCode,
+                    OnLicFileNotFound: DownloadLicenseFile,
+                    OnTrialValidated: () => ReceiptCode,
+                    OnLicenseHandledSuccessfully: _ => view.Close());
+
+                LicenseOperationRunner.Run(handler, ex => ShowErrorView(view, ex));
             }
-            catch (Exception e)
+            finally
             {
-                ShowErrorView(view, e);
+                IsBusy = false;
             }
         }
 
-        private void GetNewLicFile(LicHandlingContext context)
+        private void DownloadLicenseFile(LicHandlingContext context)
         {
             var handler = new LicenseHandlingInstall(context, null);
             handler.HandleLicense();
         }
-
-        private string GetNewReceiptCode()
-        {
-            return ReceiptCode;
-        }
-
-        private void ChangeDefaultTrail(PublisherPreferences preferences)
-        {
-
-        }
-
-        private void ComputerUnregistered(ComputerModel model)
-        {
-        }
-
     }
 }

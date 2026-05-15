@@ -74,7 +74,7 @@ namespace LicenseManagement.Sample.Wpf
                 FeatureMessage.Text = $"License validation failed: {ex.Message}";
 
                 // Disable all features on error
-                UpdateFeatureAccess(LicenseStatusTitles.InValidTrial);
+                UpdateFeatureAccess(LicenseStatusTitles.InvalidTrial);
             }
         }
 
@@ -105,7 +105,7 @@ namespace LicenseManagement.Sample.Wpf
             {
                 LicenseStatusTitles.Valid => "Full access enabled. All features are available.",
                 LicenseStatusTitles.ValidTrial => $"Trial mode. {GetTrialDaysRemaining(license)} days remaining.",
-                LicenseStatusTitles.InValidTrial => "Trial has expired. Please purchase a license.",
+                LicenseStatusTitles.InvalidTrial => "Trial has expired. Please purchase a license.",
                 LicenseStatusTitles.ReceiptExpired => "Subscription expired. Please renew.",
                 LicenseStatusTitles.ReceiptUnregistered => "License unregistered. Please enter a product key.",
                 _ => "Unknown license status."
@@ -244,7 +244,7 @@ namespace LicenseManagement.Sample.Wpf
             var licenseViewModel = LicenseViewModel.FromContext(_currentContext, products);
 
             // Show the built-in license management window from the LicenseManagement package
-            var licenseWindow = new LicenseManagement.EndUser.Wpf.Views.MainWindow
+            var licenseWindow = new LicenseManagement.EndUser.Wpf.MainWindow
             {
                 Owner = this,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,

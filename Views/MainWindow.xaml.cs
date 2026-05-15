@@ -1,15 +1,9 @@
+using LicenseManagement.EndUser.Wpf.Configuration;
 using LicenseManagement.EndUser.Wpf.ViewModels;
 using System;
-using System.Collections.Specialized;
-using System.Configuration;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 
 namespace LicenseManagement.EndUser.Wpf
 {
@@ -24,108 +18,53 @@ namespace LicenseManagement.EndUser.Wpf
         }
 
         #region dependency property set up
-        public static DependencyProperty LicenseProperty { get; }
+        public static readonly DependencyProperty LicenseProperty =
+            DependencyProperty.Register(
+                nameof(License),
+                typeof(LicenseViewModel),
+                typeof(MainWindow),
+                new PropertyMetadata(LicenseConfigurationLoader.TryLoad(), OnLicenseChanged));
 
         /// <summary>
-        /// CLR wrapper for dependency property
+        /// CLR wrapper for the License dependency property.
         /// </summary>
         public LicenseViewModel License
         {
-            get => GetValue(LicenseProperty) as LicenseViewModel;
+            get => (LicenseViewModel)GetValue(LicenseProperty);
             set => SetValue(LicenseProperty, value);
         }
-        public static void LicenseChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            var win = sender as MainWindow;
-            win.License = e.NewValue as LicenseViewModel;
-            //win.OnLicenseChanged(e);
-        }
 
-        public virtual void OnLicenseChanged(DependencyPropertyChangedEventArgs e)
+        private static void OnLicenseChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var newVal = e.NewValue as LicenseViewModel;
-            //newVal.
-        }
-        public static PropertyMetadata Meta
-        {
-            get
-            {
-
-                if (ConfigurationManager.AppSettings.Count != 0)
-                {
-                    if (!uint.TryParse(ConfigurationManager.AppSettings.Get("validDays"), out uint valid))
-                        valid = 90;
-
-                    var defaultValue = new LicenseViewModel()
-                    {
-                        Expires = DateTime.Now,
-                        ValidDays = valid,
-                        //ProductId = ConfigurationManager.AppSettings.Get("productId") ?? "",
-                        VendorId = ConfigurationManager.AppSettings.Get("vendorId") ?? "",
-                        PublicKey = ConfigurationManager.AppSettings.Get("publicKey") ?? "",
-                        ApiKey = ConfigurationManager.AppSettings.Get("ApiKey") ?? "",
-                    };
-                    var ps = (NameValueCollection)ConfigurationManager.GetSection("Products");
-                    defaultValue.Products = new System.Collections.ObjectModel.ObservableCollection<ProductViewModel>();
-                    foreach (var item in ps.AllKeys)
-                    {
-                        defaultValue.Products.Add(new ProductViewModel { Id = item, Name = ps[item] });
-                    }
-                    defaultValue.Product = defaultValue.Products.FirstOrDefault();
-                    var model = new PropertyMetadata(defaultValue, propertyChangedCallback: LicenseChanged);
-                    return model;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
-        static MainWindow()
-        {
-            LicenseProperty = DependencyProperty.Register(nameof(License),
-                typeof(LicenseViewModel),
-                ownerType: typeof(MainWindow),
-                typeMetadata: Meta);
+            // dependency property already stores the new value; nothing extra to do
         }
         #endregion
 
-        private void OnProductsSlectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void OnProductsSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count > 0)
             {
-                var newSelection = e.AddedItems[0] as ProductViewModel;
-                License.CheckLiceneFile(this);
+                License?.CheckLiceneFile(this);
             }
         }
 
-
         private void thisView_Loaded(object sender, RoutedEventArgs e)
         {
+            Loaded -= thisView_Loaded;
 
-            productsComboBox.SelectedIndex = 0;
-            //var presenter = productsComboBox.Template.FindName("PART_ItemsPresenter", productsComboBox);
-            // Example: Access ComboBoxItem safely
+            if (productsComboBox.Items.Count > 0)
+                productsComboBox.SelectedIndex = 0;
 
-            //var item = productsComboBox.ItemContainerGenerator.ContainerFromIndex(0) as ComboBoxItem;
-            //if (item != null)
-            //{
-            //    Debug.WriteLine("ComboBoxItem is ready: " + item.Content);
-            //}
-
-            //License.RenewLicenseFileAction(this);
-            if (Application.ResourceAssembly == null)
-            {
-                Application.ResourceAssembly = Assembly.GetExecutingAssembly();
-            }
             if (licenseImage.Source == null)
             {
-                licenseImage.Source = new BitmapImage(new Uri("pack://application:,,,/LicenseManagement.EndUser.Wpf;component/Assets/license.png", UriKind.Absolute));
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri("pack://application:,,,/LicenseManagement.EndUser.Wpf;component/Assets/license.png", UriKind.Absolute);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+                bitmap.Freeze();
+                licenseImage.Source = bitmap;
             }
-            //var rebuilt = productsComboBox.ApplyTemplate();
-
-            // You can also inspect or adjust bindings here
         }
     }
 }

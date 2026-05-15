@@ -3,27 +3,27 @@ using System.Windows.Input;
 
 namespace LicenseManagement.EndUser.Wpf.Commands
 {
-    internal class RelayCommand : ICommand
+    public class RelayCommand : ICommand
     {
-        private Action<object> executeAction;
-        private Predicate<object> canExecutePredicate;
+        private readonly Action<object> _execute;
+        private readonly Predicate<object> _canExecute;
 
-        public RelayCommand(Action<object> execute, Predicate<object> canExecute)
+        public RelayCommand(Action<object> execute, Predicate<object> canExecute = null)
         {
-            this.executeAction = execute;
-            this.canExecutePredicate = canExecute;
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _canExecute = canExecute;
         }
 
-        public event EventHandler CanExecuteChanged;
-
-        public bool CanExecute(object parameter)
+        public event EventHandler CanExecuteChanged
         {
-            return canExecutePredicate(parameter);
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
         }
 
-        public void Execute(object parameter)
-        {
-            executeAction(parameter);
-        }
+        public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
+
+        public void Execute(object parameter) => _execute(parameter);
+
+        public void RaiseCanExecuteChanged() => CommandManager.InvalidateRequerySuggested();
     }
 }

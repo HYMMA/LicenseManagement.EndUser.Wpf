@@ -36,9 +36,10 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
     <AssemblyOriginatorKeyFile>Enduser.wpf.snk</AssemblyOriginatorKeyFile>
+    <!-- Single source of truth for the LicenseManagement.EndUser dependency version.
+         The packages.config entry and the workflow inputs must match this value. -->
+    <LicenseEndUserVersion>2.0.1</LicenseEndUserVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -59,12 +60,14 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\LicenseOperationRunner.cs" />
     <Compile Include="Commands\RelayCommand.cs" />
+    <Compile Include="Configuration\LicenseConfigurationLoader.cs" />
+    <Compile Include="Configuration\PublisherPreferencesFactory.cs" />
     <Compile Include="Converters\ValueConverters\UtcToLocalTimeConverter.cs" />
     <Compile Include="Rules\ReceiptCodeRule.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
-    <Compile Include="ViewModels\ErrorViewModel.cs" />
     <Compile Include="ViewModels\LicenseViewModel.cs" />
     <Compile Include="ViewModels\ProductViewModel.cs" />
     <Compile Include="ViewModels\RegisterLicenseViewModel.cs" />
@@ -84,11 +87,7 @@
     <Compile Include="Views\LicenseControl.xaml.cs">
       <DependentUpon>LicenseControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Converters\ValueConverters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\ValueConverters\LicenseStatusConverter.cs" />
-    <Compile Include="Window1.xaml.cs">
-      <DependentUpon>Window1.xaml</DependentUpon>
-    </Compile>
     <Page Include="AppResources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -112,10 +111,6 @@
     <Page Include="Views\LicenseControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Window1.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -144,7 +139,7 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="padlock.ico" />
+    <Resource Include="Assets\padlock.ico" />
   </ItemGroup>
   <!-- Local development: use project reference -->
   <ItemGroup Condition="Exists('..\LicenseManagement.EndUser\LicenseManagement.EndUser\LicenseManagement.EndUser.csproj')">
@@ -156,7 +151,7 @@
   <!-- CI/CD: use NuGet package reference -->
   <ItemGroup Condition="!Exists('..\LicenseManagement.EndUser\LicenseManagement.EndUser\LicenseManagement.EndUser.csproj')">
     <Reference Include="LicenseManagement.EndUser">
-      <HintPath>packages\LicenseManagement.EndUser.2.0.0\lib\net481\LicenseManagement.EndUser.dll</HintPath>
+      <HintPath>packages\LicenseManagement.EndUser.$(LicenseEndUserVersion)\lib\net481\LicenseManagement.EndUser.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

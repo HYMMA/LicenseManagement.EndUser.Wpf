@@ -59,5 +59,23 @@ namespace LicenseManagement.EndUser.Wpf.Properties {
                 resourceCulture = value;
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Product code cannot be empty.
+        /// </summary>
+        internal static string ReceiptCodeEmpty {
+            get {
+                return ResourceManager.GetString("ReceiptCodeEmpty", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Product code cannot be more than {0} characters.
+        /// </summary>
+        internal static string ReceiptCodeTooLong {
+            get {
+                return ResourceManager.GetString("ReceiptCodeTooLong", resourceCulture);
+            }
+        }
     }
 }

@@ -1,30 +1,24 @@
-using LicenseManagement.EndUser.Exceptions;
 using LicenseManagement.EndUser.License;
 using LicenseManagement.EndUser.Models;
 using LicenseManagement.EndUser.Wpf.Commands;
+using LicenseManagement.EndUser.Wpf.Configuration;
 using LicenseManagement.EndUser.Wpf.Views;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Security;
-using System.Security.Cryptography;
-using System.Windows.Documents;
+using System.ComponentModel;
+using System.Windows;
 using System.Windows.Input;
 using System.Xml.Serialization;
 
 namespace LicenseManagement.EndUser.Wpf.ViewModels
 {
-
     [XmlType("License")]
     public class LicenseViewModel : BaseViewModel
     {
-        DateTime? expires;
-        LicenseStatusTitles status;
+        private DateTime? _expires;
+        private LicenseStatusTitles _status;
         private string _fullFileName;
-        private DateTime? receiptExpires;
+        private DateTime? _receiptExpires;
         private string _mac;
         private string _code;
         private string _message;
@@ -36,21 +30,34 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
         private ProductViewModel _product;
         private string _customerEmail;
         private ObservableCollection<ProductViewModel> _products;
+        private string _apiKey;
+        private bool _isBusy;
 
-        public static LicenseViewModel FromContext(LicHandlingContext context,ObservableCollection<ProductViewModel> products)
+        private readonly RelayCommand _showRegisterView;
+        private readonly RelayCommand _showUnregisterView;
+        private readonly RelayCommand _renewLicenseFile;
+
+        public LicenseViewModel()
         {
-            var lic = new LicenseViewModel()
+            _showRegisterView = new RelayCommand(ShowRegisterWindow, _ => !IsBusy);
+            _showUnregisterView = new RelayCommand(ShowUnregisterWindow, _ => !IsBusy);
+            _renewLicenseFile = new RelayCommand(RenewLicenseFileAction, _ => !IsBusy && _apiKey != null);
+        }
+
+        public static LicenseViewModel FromContext(LicHandlingContext context, ObservableCollection<ProductViewModel> products)
+        {
+            var lic = new LicenseViewModel
             {
                 ValidDays = context.PublisherPreferences.ValidDays,
                 VendorId = context.PublisherPreferences.VendorId,
                 PublicKey = context.PublisherPreferences.PublicKey,
-                ApiKey = context.PublisherPreferences.ApiKey,
                 TrialExpires = context.LicenseModel.TrialEndDate,
                 Created = context.LicenseModel.Created,
                 Expires = context.LicenseModel.Expires,
                 Updated = context.LicenseModel.Updated,
                 Status = context.LicenseModel.Status
             };
+            lic.SetApiKey(context.PublisherPreferences.ApiKey);
             if (context.LicenseModel.Receipt != null)
             {
                 lic.ReceiptCode = context.LicenseModel.Receipt.Code;
@@ -60,135 +67,77 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
             if (context.LicenseModel.Product != null)
             {
                 lic.Product = ProductViewModel.FromProductModel(context.LicenseModel.Product);
-                lic.VendorName = context.LicenseModel.Product?.Vendor.Name;
+                lic.VendorName = context.LicenseModel.Product.Vendor?.Name;
             }
             if (context.LicenseModel.Computer != null)
             {
-                lic.ComputerName = context.LicenseModel.Computer?.Name;
-                lic.MacAddress = context.LicenseModel.Computer?.MacAddress;
+                lic.ComputerName = context.LicenseModel.Computer.Name;
+                lic.MacAddress = context.LicenseModel.Computer.MacAddress;
             }
             lic.Products = products;
             return lic;
         }
 
-        /// <summary>
-        /// full file name of the license file
-        /// </summary>
         public string FullFileName
         {
-            get { return _fullFileName; }
-            set
-            {
-                if (_fullFileName != value)
-                {
-                    _fullFileName = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _fullFileName;
+            set { if (_fullFileName != value) { _fullFileName = value; OnPropertyChanged(); } }
         }
 
-        /// <summary>
-        /// the email of the customer who purchased the product
-        /// </summary>
         public string CustomerEmail
         {
-            get => _customerEmail; set
-            {
-                _customerEmail = value;
-                OnPropertyChanged();
-            }
+            get => _customerEmail;
+            set { if (_customerEmail != value) { _customerEmail = value; OnPropertyChanged(); } }
         }
 
         public DateTime? Expires
         {
-            get => expires; set
-            {
-                if (expires != value)
-                {
-                    expires = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _expires;
+            set { if (_expires != value) { _expires = value; OnPropertyChanged(); } }
         }
 
         public DateTime? ReceiptExpires
         {
-            get => receiptExpires; set
-            {
-                if (receiptExpires != value)
-                {
-                    receiptExpires = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _receiptExpires;
+            set { if (_receiptExpires != value) { _receiptExpires = value; OnPropertyChanged(); } }
         }
 
         public DateTime? TrialExpires
         {
-            get => _trialExpires; set
-            {
-                if (_trialExpires != value)
-                {
-                    _trialExpires = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _trialExpires;
+            set { if (_trialExpires != value) { _trialExpires = value; OnPropertyChanged(); } }
         }
+
         public string ComputerName
         {
-            get => _compName; set
-            {
-                if (_compName != value)
-                {
-                    _compName = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _compName;
+            set { if (_compName != value) { _compName = value; OnPropertyChanged(); } }
         }
 
         public string MacAddress
         {
-            get => _mac; set
-            {
-                if (_mac != value)
-                {
-                    _mac = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _mac;
+            set { if (_mac != value) { _mac = value; OnPropertyChanged(); } }
         }
 
         public string VendorName
         {
-            get { return _vendorName; }
-            set
-            {
-                if (_vendorName != value)
-                {
-                    _vendorName = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _vendorName;
+            set { if (_vendorName != value) { _vendorName = value; OnPropertyChanged(); } }
         }
 
         public ObservableCollection<ProductViewModel> Products
         {
-            get => _products; set
-            {
-                _products = value;
-                OnPropertyChanged();
-            }
+            get => _products;
+            set { if (_products != value) { _products = value; OnPropertyChanged(); } }
         }
+
         public ProductViewModel Product
         {
-            get => _product; set
+            get => _product;
+            set
             {
-                if (_product == null)
-                {
-                    _product = value;
-                    OnPropertyChanged();
-                }
-                else if (_product.Id != value.Id)
+                if (!ReferenceEquals(_product, value))
                 {
                     _product = value;
                     OnPropertyChanged();
@@ -198,120 +147,120 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
 
         public string VendorId
         {
-            get => _vendorId; set
-            {
-                if (_vendorId != value)
-                {
-                    _vendorId = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _vendorId;
+            set { if (_vendorId != value) { _vendorId = value; OnPropertyChanged(); } }
         }
 
         public string ReceiptCode
         {
-            get => _code; set
-            {
-                if (_code != value)
-                {
-                    _code = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _code;
+            set { if (_code != value) { _code = value; OnPropertyChanged(); } }
         }
 
         public string Message
         {
             get => _message;
-            set
-            {
-                if (_message != value)
-                {
-                    _message = value;
-                    OnPropertyChanged();
-                }
-            }
+            set { if (_message != value) { _message = value; OnPropertyChanged(); } }
         }
+
         public uint ValidDays
         {
-            get => _validDays; set
-            {
-                if (_validDays != value)
-                {
-                    _validDays = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        [XmlIgnore]
-        public string ApiKey { get; set; }
-
-        public LicenseStatusTitles Status
-        {
-            get => status;
-            set
-            {
-                if (status != value)
-                {
-                    status = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _validDays;
+            set { if (_validDays != value) { _validDays = value; OnPropertyChanged(); } }
         }
 
         /// <summary>
-        /// When the user presses on the register button 
+        /// API key used to authenticate with the license server. Kept out of the
+        /// bindable property surface so it is not visible to UI inspectors (Snoop,
+        /// Live Visual Tree). Use <see cref="SetApiKey(string)"/> to configure it.
         /// </summary>
-        public ICommand ShowRegisterView => new RelayCommand(ShowRegisterWindow, (s) => true);
-        public ICommand ShowUnregisterView => new RelayCommand(ShowUnregisterWindow, (s) => true);
-        public ICommand RenewLicenseFile => new RelayCommand(RenewLicenseFileAction, (s) => ApiKey != null);
+        [XmlIgnore]
+        [Browsable(false)]
+        internal string ApiKey => _apiKey;
+
+        /// <summary>
+        /// Configures the API key used by this view model. The key is stored in a
+        /// non-bindable field so it is not reflected by XAML diagnostic tools.
+        /// </summary>
+        public void SetApiKey(string value) => _apiKey = value;
+
+        /// <summary>
+        /// Indicates whether an API key has been configured. Bind to this property
+        /// instead of <c>ApiKey</c> to drive button visibility / IsEnabled state.
+        /// </summary>
+        public bool HasApiKey => _apiKey != null;
+
+        public LicenseStatusTitles Status
+        {
+            get => _status;
+            set { if (_status != value) { _status = value; OnPropertyChanged(); } }
+        }
+
+        /// <summary>
+        /// Set to <c>true</c> while a server-bound license operation is in flight.
+        /// Used by commands to prevent double-submission (e.g. double-click on Register).
+        /// </summary>
+        public bool IsBusy
+        {
+            get => _isBusy;
+            private set
+            {
+                if (_isBusy != value)
+                {
+                    _isBusy = value;
+                    OnPropertyChanged();
+                    _showRegisterView.RaiseCanExecuteChanged();
+                    _showUnregisterView.RaiseCanExecuteChanged();
+                    _renewLicenseFile.RaiseCanExecuteChanged();
+                }
+            }
+        }
+
+        public ICommand ShowRegisterView => _showRegisterView;
+        public ICommand ShowUnregisterView => _showUnregisterView;
+        public ICommand RenewLicenseFile => _renewLicenseFile;
 
         public string PublicKey { get; internal set; }
 
         public void CheckLiceneFile(object obj)
         {
-            var publisher = new PublisherPreferences(VendorId, Product.Id, ApiKey)
-            {
-                ValidDays = ValidDays,
-                PublicKey = PublicKey
-            };
-            var context = new LicHandlingContext(publisher);
-            var handler = new LicenseHandlingLaunch(context, OnLicenseHandledSuccessfully: UpdateFromLicenseModel);
+            var source = obj as DependencyObject;
+            IsBusy = true;
             try
             {
-                handler.HandleLicense();
+                var context = new LicHandlingContext(PublisherPreferencesFactory.Build(this));
+                var handler = new LicenseHandlingLaunch(context, OnLicenseHandledSuccessfully: UpdateFromLicenseModel);
+                LicenseOperationRunner.Run(handler, ex =>
+                {
+                    UpdateFromLicenseModel(handler.HandlingContext.LicenseModel);
+                    ShowErrorView(source, context.Exception ?? ex);
+                });
             }
-            catch (Exception)
+            finally
             {
-                UpdateFromLicenseModel(handler.HandlingContext.LicenseModel);
-                ShowErrorView(obj as MainWindow, context.Exception);
+                IsBusy = false;
             }
         }
 
         internal void RenewLicenseFileAction(object obj)
         {
-            var publisher = new PublisherPreferences(VendorId, Product.Id, ApiKey)
-            {
-                ValidDays = ValidDays,
-                PublicKey = PublicKey
-            };
-            var context = new LicHandlingContext(publisher);
-            var handler = new LicenseHandlingInstall(context, UpdateFromLicenseModel);
+            var source = obj as DependencyObject;
+            IsBusy = true;
             try
             {
-                handler.HandleLicense();
-                //this = LicenseViewModel.FromContext()                
+                var context = new LicHandlingContext(PublisherPreferencesFactory.Build(this));
+                var handler = new LicenseHandlingInstall(context, UpdateFromLicenseModel);
+                LicenseOperationRunner.Run(handler, ex => ShowErrorView(source, ex));
             }
-            catch (Exception e)
+            finally
             {
-                ShowErrorView(obj as MainWindow, e);
+                IsBusy = false;
             }
-
         }
 
         internal void UpdateFromLicenseModel(LicenseModel model)
         {
-            //now read the downloaded file
+            if (model == null) return;
             TrialExpires = model.TrialEndDate;
             Created = model.Created;
             Expires = model.Expires;
@@ -321,7 +270,7 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
             VendorId = model.Product?.Vendor?.Id ?? VendorId;
             VendorName = model.Product?.Vendor?.Name ?? VendorName;
             Product = ProductViewModel.FromProductModel(model.Product) ?? Product;
-            Updated = model?.Updated;
+            Updated = model.Updated;
             if (model.Receipt != null)
             {
                 ReceiptCode = model.Receipt.Code;
@@ -332,48 +281,59 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
 
         private void ShowRegisterWindow(object obj)
         {
-            var thisView = obj as MainWindow;
+            var source = obj as DependencyObject;
+            var owner = source as Window ?? (source != null ? Window.GetWindow(source) : null);
+            var registerVm = new RegisterLicenseViewModel
+            {
+                ProductId = Product?.Id,
+                VendorId = VendorId,
+                PublicKey = PublicKey,
+                ValidDays = ValidDays,
+            };
+            registerVm.SetApiKey(_apiKey);
+
             var view = new RegisterLicenseView
             {
-                Owner = thisView,
-                WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
-                DataContext = new RegisterLicenseViewModel()
-                {
-                    ApiKey = this.ApiKey,
-                    ProductId = this.Product.Id,
-                    VendorId = this.VendorId,
-                    PublicKey = this.PublicKey,
-                    ValidDays = this.ValidDays,
-                }
+                Owner = owner,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                DataContext = registerVm
             };
-            view.Closed += (s, e) =>
+            EventHandler onClosed = null;
+            onClosed = (s, e) =>
             {
-                CheckLiceneFile(thisView);
+                view.Closed -= onClosed;
+                CheckLiceneFile(source ?? owner);
             };
+            view.Closed += onClosed;
             view.ShowDialog();
         }
 
         private void ShowUnregisterWindow(object obj)
         {
-            var thisView = obj as MainWindow;
+            var source = obj as DependencyObject;
+            var owner = source as Window ?? (source != null ? Window.GetWindow(source) : null);
+            var unregisterVm = new UnregisterViewModel
+            {
+                ProductId = Product?.Id,
+                VendorId = VendorId,
+                PublicKey = PublicKey,
+            };
+            unregisterVm.SetApiKey(_apiKey);
+
             var view = new UnregisterView
             {
-                Owner = thisView,
-                WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
-                DataContext = new UnregisterViewModel()
-                {
-                    ApiKey = ApiKey,
-                    ProductId = Product.Id,
-                    VendorId = VendorId,
-                    PublicKey = PublicKey,
-                }
+                Owner = owner,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                DataContext = unregisterVm
             };
-            view.Closed += (s, e) =>
+            EventHandler onClosed = null;
+            onClosed = (s, e) =>
             {
-                CheckLiceneFile(thisView);
+                view.Closed -= onClosed;
+                CheckLiceneFile(source ?? owner);
             };
+            view.Closed += onClosed;
             view.ShowDialog();
         }
     }
 }
-
