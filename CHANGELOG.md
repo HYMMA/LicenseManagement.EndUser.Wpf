@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2026-06-17
+
+### Fixed
+- **Aligned the core `LicenseManagement.EndUser` version across the whole build.** The
+  net481 assembly was compiled in CI against 2.0.1 while the package bundled 3.0.2 and
+  the net8 asset depended on 3.1.0 — three different versions, risking a runtime
+  `MissingMethodException` for net481 consumers (a constructor signature differs between
+  2.x and 3.x). Everything now uses **3.1.1**: the CI install/build version, the bundled
+  net481 DLL, and the net8 dependency. Also picks up the net8 DNS-staleness and
+  HTTPS-guard fixes from EndUser 3.1.1.
+
 ## [2.2.0] - 2026-06-16
 
 ### Added

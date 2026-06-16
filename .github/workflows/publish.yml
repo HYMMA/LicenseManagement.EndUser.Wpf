@@ -55,8 +55,9 @@ jobs:
       if: steps.check_nuget.outputs.EXISTS != 'true'
       shell: pwsh
       run: |
-        # Install the EndUser package first (required for build)
-        nuget install LicenseManagement.EndUser -Version 2.0.1 -OutputDirectory packages
+        # Install the EndUser package first (required for build). Must match the version the
+        # net481 assembly is built against AND the one bundled in the nuspec (see below).
+        nuget install LicenseManagement.EndUser -Version 3.1.1 -OutputDirectory packages
 
     - name: Restore NuGet packages
       if: steps.check_nuget.outputs.EXISTS != 'true'
@@ -71,7 +72,7 @@ jobs:
 
     - name: Build Release
       if: steps.check_nuget.outputs.EXISTS != 'true'
-      run: msbuild LicenseManagement.EndUser.Wpf.csproj /p:Configuration=Release /p:Platform=AnyCPU /p:LicenseEndUserVersion=2.0.1
+      run: msbuild LicenseManagement.EndUser.Wpf.csproj /p:Configuration=Release /p:Platform=AnyCPU /p:LicenseEndUserVersion=3.1.1
 
     # Build the sibling net8.0-windows assembly (links the same XAML + sources). Its
     # output is packed into lib/net8.0-windows7.0 alongside the unchanged net481 assembly.
