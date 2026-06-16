@@ -1,0 +1,80 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    net8.0-windows build of LicenseManagement.EndUser.Wpf.
+
+    Sibling project that LINKS the same XAML + sources as the original net4.8.1 project
+    (one folder up). It does NOT replace it — the net481 assembly the SolidWorks add-in
+    consumes is built unchanged by the original csproj. This only adds a net8.0-windows
+    asset to the same NuGet package so the .NET 8 Inventor add-in can use the shared
+    license dialog (Window + LicenseControl, with the products ComboBox).
+
+    net8 deltas, no behaviour change:
+      - References the net8 LicenseManagement.EndUser package (3.1.0) instead of the net481 one.
+      - System.Configuration.ConfigurationManager is a package on net8 (BCL on net481).
+      - Settings.cs (Properties.Settings) is unreferenced anywhere, so it is dropped.
+      - Properties\Resources.resx/.Designer are dropped; the two used strings are supplied
+        by net8\Resources.cs (the resx also held unused System.Drawing template entries
+        that net8 resgen can't process).
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>LicenseManagement.EndUser.Wpf</AssemblyName>
+    <RootNamespace>LicenseManagement.EndUser.Wpf</RootNamespace>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Deterministic>true</Deterministic>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Enduser.wpf.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LicenseManagement.EndUser" Version="3.1.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.17" />
+  </ItemGroup>
+
+  <!-- Sources (linked from the parent net481 project; Settings.cs + Resources.Designer.cs excluded). -->
+  <ItemGroup>
+    <Compile Include="Resources.cs" />
+    <Compile Include="..\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\Commands\LicenseOperationRunner.cs" Link="Commands\LicenseOperationRunner.cs" />
+    <Compile Include="..\Commands\RelayCommand.cs" Link="Commands\RelayCommand.cs" />
+    <Compile Include="..\Configuration\LicenseConfigurationLoader.cs" Link="Configuration\LicenseConfigurationLoader.cs" />
+    <Compile Include="..\Configuration\PublisherPreferencesFactory.cs" Link="Configuration\PublisherPreferencesFactory.cs" />
+    <Compile Include="..\Converters\ValueConverters\UtcToLocalTimeConverter.cs" Link="Converters\ValueConverters\UtcToLocalTimeConverter.cs" />
+    <Compile Include="..\Converters\ValueConverters\LicenseStatusConverter.cs" Link="Converters\ValueConverters\LicenseStatusConverter.cs" />
+    <Compile Include="..\Rules\ReceiptCodeRule.cs" Link="Rules\ReceiptCodeRule.cs" />
+    <Compile Include="..\ViewModels\BaseViewModel.cs" Link="ViewModels\BaseViewModel.cs" />
+    <Compile Include="..\ViewModels\LicenseViewModel.cs" Link="ViewModels\LicenseViewModel.cs" />
+    <Compile Include="..\ViewModels\ProductViewModel.cs" Link="ViewModels\ProductViewModel.cs" />
+    <Compile Include="..\ViewModels\RegisterLicenseViewModel.cs" Link="ViewModels\RegisterLicenseViewModel.cs" />
+    <Compile Include="..\ViewModels\UnregisterViewModel.cs" Link="ViewModels\UnregisterViewModel.cs" />
+    <Compile Include="..\Views\ErrorView.xaml.cs" Link="Views\ErrorView.xaml.cs" />
+    <Compile Include="..\Views\MainWindow.xaml.cs" Link="Views\MainWindow.xaml.cs" />
+    <Compile Include="..\Views\RegisterLicenseView.xaml.cs" Link="Views\RegisterLicenseView.xaml.cs" />
+    <Compile Include="..\Views\UnregisterView.xaml.cs" Link="Views\UnregisterView.xaml.cs" />
+    <Compile Include="..\Views\LicenseControl.xaml.cs" Link="Views\LicenseControl.xaml.cs" />
+  </ItemGroup>
+
+  <!-- XAML. Link paths mirror the original layout so component pack URIs resolve
+       (AppResources.xaml at root, Assets/* as resources). -->
+  <ItemGroup>
+    <Page Include="..\AppResources.xaml" Link="AppResources.xaml" />
+    <Page Include="..\Views\ErrorView.xaml" Link="Views\ErrorView.xaml" />
+    <Page Include="..\Views\MainWindow.xaml" Link="Views\MainWindow.xaml" />
+    <Page Include="..\Views\RegisterLicenseView.xaml" Link="Views\RegisterLicenseView.xaml" />
+    <Page Include="..\Views\UnregisterView.xaml" Link="Views\UnregisterView.xaml" />
+    <Page Include="..\Views\LicenseControl.xaml" Link="Views\LicenseControl.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="..\Assets\error.png" Link="Assets\error.png" />
+    <Resource Include="..\Assets\license.png" Link="Assets\license.png" />
+    <Resource Include="..\Assets\padlock.ico" Link="Assets\padlock.ico" />
+  </ItemGroup>
+
+</Project>

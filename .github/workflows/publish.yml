@@ -18,6 +18,11 @@ jobs:
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v2
 
+    - name: Setup .NET 8 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
     - name: Extract version from tag
       id: get_version
       shell: pwsh
@@ -67,6 +72,12 @@ jobs:
     - name: Build Release
       if: steps.check_nuget.outputs.EXISTS != 'true'
       run: msbuild LicenseManagement.EndUser.Wpf.csproj /p:Configuration=Release /p:Platform=AnyCPU /p:LicenseEndUserVersion=2.0.1
+
+    # Build the sibling net8.0-windows assembly (links the same XAML + sources). Its
+    # output is packed into lib/net8.0-windows7.0 alongside the unchanged net481 assembly.
+    - name: Build Release (net8.0-windows)
+      if: steps.check_nuget.outputs.EXISTS != 'true'
+      run: dotnet build net8/LicenseManagement.EndUser.Wpf.Net8.csproj -c Release
 
     - name: Update nuspec version
       if: steps.check_nuget.outputs.EXISTS != 'true'

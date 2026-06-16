@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-06-16
+
+### Added
+- **net8.0-windows target.** The package now ships `lib/net8.0-windows7.0` alongside the
+  existing `lib/net481`, so .NET 8 WPF hosts (e.g. the CadShift for Inventor add-in) can
+  reuse the shared license Window / LicenseControl — including the products ComboBox that
+  binds to the developer-supplied product list. Built by a sibling project (`net8/`) that
+  links the same XAML + sources; the net481 assembly is unchanged. On net8 the core SDK
+  and `System.Configuration.ConfigurationManager` come in as package dependencies (bundled
+  as loose files only for net481), and the unused `Properties.Settings` / System.Drawing
+  resx template entries are dropped.
+
 ## [2.1.1] - 2026-05-15
 
 ### Changed
