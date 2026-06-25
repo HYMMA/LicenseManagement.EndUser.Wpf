@@ -24,6 +24,26 @@ namespace LicenseManagement.EndUser.Wpf.Converters
         public bool ShowTrialPanel { get; set; }
         public bool ShowUnregister { get; set; }
         public bool ShowRenewFile { get; set; }
+
+        // --- card presentation (status pill + validity meter) ---
+        public string StatusLabel { get; set; }
+        public Color PillForeground { get; set; }
+        public Color PillBackground { get; set; }
+        public Color Meter { get; set; }
+    }
+
+    /// <summary>Named palette shared by the status pill and the validity meter.</summary>
+    internal static class StatusPalette
+    {
+        public static readonly Color Ok = Color.FromRgb(0x15, 0x80, 0x3D);
+        public static readonly Color OkTint = Color.FromRgb(0xE6, 0xF4, 0xEA);
+        public static readonly Color Trial = Color.FromRgb(0xB4, 0x53, 0x09);
+        public static readonly Color TrialTint = Color.FromRgb(0xFB, 0xEE, 0xDC);
+        public static readonly Color Bad = Color.FromRgb(0xB9, 0x1C, 0x1C);
+        public static readonly Color BadTint = Color.FromRgb(0xFB, 0xEA, 0xEA);
+        public static readonly Color None = Color.FromRgb(0x47, 0x55, 0x69);
+        public static readonly Color NoneTint = Color.FromRgb(0xED, 0xF1, 0xF5);
+        public static readonly Color Faint = Color.FromRgb(0x94, 0xA3, 0xB8);
     }
 
     /// <summary>
@@ -44,11 +64,28 @@ namespace LicenseManagement.EndUser.Wpf.Converters
             Description = "Unknown",
             Background = Colors.Transparent,
             Border = Colors.Gray,
+            StatusLabel = "Not checked",
+            PillForeground = StatusPalette.None,
+            PillBackground = StatusPalette.NoneTint,
+            Meter = StatusPalette.Faint,
         };
 
         private static readonly IReadOnlyDictionary<LicenseStatusTitles, LicenseStatusPresentation> Table =
             new Dictionary<LicenseStatusTitles, LicenseStatusPresentation>
             {
+                [LicenseStatusTitles.Unknown] = new LicenseStatusPresentation
+                {
+                    // Reached only when a check completed but couldn't be verified (e.g. it
+                    // threw). Distinct from "never checked" (the null Fallback) so a failed
+                    // check never masquerades as an unloaded card.
+                    Description = "Could not verify the license.",
+                    Background = Colors.Transparent,
+                    Border = Colors.Gray,
+                    StatusLabel = "Unverified",
+                    PillForeground = StatusPalette.Trial,
+                    PillBackground = StatusPalette.TrialTint,
+                    Meter = StatusPalette.Faint,
+                },
                 [LicenseStatusTitles.Expired] = new LicenseStatusPresentation
                 {
                     Description = "License file expired.",
@@ -56,6 +93,10 @@ namespace LicenseManagement.EndUser.Wpf.Converters
                     Border = Colors.DarkRed,
                     ShowRenewFile = true,
                     ShowSubscriptionPanel = true,
+                    StatusLabel = "Expired",
+                    PillForeground = StatusPalette.Bad,
+                    PillBackground = StatusPalette.BadTint,
+                    Meter = StatusPalette.Bad,
                 },
                 [LicenseStatusTitles.Valid] = new LicenseStatusPresentation
                 {
@@ -64,6 +105,10 @@ namespace LicenseManagement.EndUser.Wpf.Converters
                     Border = Colors.Green,
                     ShowUnregister = true,
                     ShowSubscriptionPanel = true,
+                    StatusLabel = "Licensed",
+                    PillForeground = StatusPalette.Ok,
+                    PillBackground = StatusPalette.OkTint,
+                    Meter = StatusPalette.Ok,
                 },
                 [LicenseStatusTitles.ValidTrial] = new LicenseStatusPresentation
                 {
@@ -72,6 +117,10 @@ namespace LicenseManagement.EndUser.Wpf.Converters
                     Border = Colors.Blue,
                     ShowRegisterPrompt = true,
                     ShowTrialPanel = true,
+                    StatusLabel = "Trial",
+                    PillForeground = StatusPalette.Trial,
+                    PillBackground = StatusPalette.TrialTint,
+                    Meter = StatusPalette.Trial,
                 },
                 [LicenseStatusTitles.InvalidTrial] = new LicenseStatusPresentation
                 {
@@ -79,6 +128,10 @@ namespace LicenseManagement.EndUser.Wpf.Converters
                     Background = Colors.LightSalmon,
                     Border = Colors.DarkRed,
                     ShowRegisterPrompt = true,
+                    StatusLabel = "Trial ended",
+                    PillForeground = StatusPalette.Bad,
+                    PillBackground = StatusPalette.BadTint,
+                    Meter = StatusPalette.Bad,
                 },
                 [LicenseStatusTitles.ReceiptExpired] = new LicenseStatusPresentation
                 {
@@ -86,6 +139,10 @@ namespace LicenseManagement.EndUser.Wpf.Converters
                     Background = Colors.LightSalmon,
                     Border = Colors.DarkRed,
                     ShowRegisterPrompt = true,
+                    StatusLabel = "Renewal needed",
+                    PillForeground = StatusPalette.Bad,
+                    PillBackground = StatusPalette.BadTint,
+                    Meter = StatusPalette.Bad,
                 },
                 [LicenseStatusTitles.ReceiptUnregistered] = new LicenseStatusPresentation
                 {
@@ -93,6 +150,10 @@ namespace LicenseManagement.EndUser.Wpf.Converters
                     Background = Colors.LightGray,
                     Border = Colors.Black,
                     ShowRegisterPrompt = true,
+                    StatusLabel = "Not registered",
+                    PillForeground = StatusPalette.None,
+                    PillBackground = StatusPalette.NoneTint,
+                    Meter = StatusPalette.Faint,
                 },
             };
 
@@ -143,6 +204,14 @@ namespace LicenseManagement.EndUser.Wpf.Converters
                     return p.ShowUnregister ? Visibility.Visible : Visibility.Collapsed;
                 case "ShowRenewFile":
                     return p.ShowRenewFile ? Visibility.Visible : Visibility.Collapsed;
+                case "StatusLabel":
+                    return p.StatusLabel ?? p.Description;
+                case "PillForeground":
+                    return FrozenBrush(p.PillForeground);
+                case "PillBackground":
+                    return FrozenBrush(p.PillBackground);
+                case "Meter":
+                    return FrozenBrush(p.Meter);
                 case "Description":
                 default:
                     return p.Description;

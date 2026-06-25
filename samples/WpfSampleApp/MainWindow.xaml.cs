@@ -223,35 +223,20 @@ namespace LicenseManagement.Sample.Wpf
         }
 
         /// <summary>
-        /// Opens the built-in license management window.
+        /// Opens the built-in grouped-card license window. With no <c>License</c> set, it
+        /// loads every product, its grouping (App.config &lt;ProductGroups&gt;) and the
+        /// layout (the <c>licenseLayout</c> app setting) automatically, then checks each
+        /// card against the server on demand.
         /// </summary>
         private void ManageLicenseButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentContext == null)
-            {
-                MessageBox.Show("Please wait for license validation to complete.");
-                return;
-            }
-
-            // Create products collection for the license view
-            var products = new ObservableCollection<ProductViewModel>();
-            if (_currentContext.LicenseModel.Product != null)
-            {
-                products.Add(ProductViewModel.FromProductModel(_currentContext.LicenseModel.Product));
-            }
-
-            // Create license view model from the current context
-            var licenseViewModel = LicenseViewModel.FromContext(_currentContext, products);
-
-            // Show the built-in license management window from the LicenseManagement package
             var licenseWindow = new LicenseManagement.EndUser.Wpf.MainWindow
             {
                 Owner = this,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                License = licenseViewModel
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
             };
 
-            // Refresh after closing
+            // Refresh the dashboard panel after the license window closes.
             licenseWindow.Closed += (s, args) => ValidateLicense();
             licenseWindow.ShowDialog();
         }

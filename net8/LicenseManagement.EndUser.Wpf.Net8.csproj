@@ -44,12 +44,15 @@
     <Compile Include="..\Commands\LicenseOperationRunner.cs" Link="Commands\LicenseOperationRunner.cs" />
     <Compile Include="..\Commands\RelayCommand.cs" Link="Commands\RelayCommand.cs" />
     <Compile Include="..\Configuration\LicenseConfigurationLoader.cs" Link="Configuration\LicenseConfigurationLoader.cs" />
+    <Compile Include="..\Configuration\ProductGroupDefinition.cs" Link="Configuration\ProductGroupDefinition.cs" />
     <Compile Include="..\Configuration\PublisherPreferencesFactory.cs" Link="Configuration\PublisherPreferencesFactory.cs" />
     <Compile Include="..\Converters\ValueConverters\UtcToLocalTimeConverter.cs" Link="Converters\ValueConverters\UtcToLocalTimeConverter.cs" />
     <Compile Include="..\Converters\ValueConverters\LicenseStatusConverter.cs" Link="Converters\ValueConverters\LicenseStatusConverter.cs" />
     <Compile Include="..\Rules\ReceiptCodeRule.cs" Link="Rules\ReceiptCodeRule.cs" />
     <Compile Include="..\ViewModels\BaseViewModel.cs" Link="ViewModels\BaseViewModel.cs" />
     <Compile Include="..\ViewModels\LicenseViewModel.cs" Link="ViewModels\LicenseViewModel.cs" />
+    <Compile Include="..\ViewModels\ProductLayout.cs" Link="ViewModels\ProductLayout.cs" />
+    <Compile Include="..\ViewModels\ProductGroupViewModel.cs" Link="ViewModels\ProductGroupViewModel.cs" />
     <Compile Include="..\ViewModels\ProductViewModel.cs" Link="ViewModels\ProductViewModel.cs" />
     <Compile Include="..\ViewModels\RegisterLicenseViewModel.cs" Link="ViewModels\RegisterLicenseViewModel.cs" />
     <Compile Include="..\ViewModels\UnregisterViewModel.cs" Link="ViewModels\UnregisterViewModel.cs" />

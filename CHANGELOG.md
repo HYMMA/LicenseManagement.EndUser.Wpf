@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-06-25
+
+### Added
+- **Grouped product cards.** The license window now renders each product as a card instead
+  of a dropdown, arranged into developer-defined groups (e.g. Monthly / Annual). Configure
+  in code with `LicenseViewModel.ApplyGrouping(IEnumerable<ProductGroupDefinition>, ProductLayout)`,
+  or zero-code via the App.config `<ProductGroups>` section + `licenseLayout` app setting.
+- **Three selectable layouts** via the new `ProductLayout` enum — `Bands` (default, stacked
+  bands), `Lanes` (side-by-side columns), `Switcher` (segmented tabs). The developer picks
+  one; the end user cannot change it.
+- **Per-card status, validity meter and actions.** Each card shows its own status chip, a
+  validity meter, the relevant expiry/countdown, and the status-appropriate action
+  (Register / Unregister / Download new file). New public types: `ProductLayout`,
+  `ProductGroupDefinition`, `ProductGroupViewModel`.
+
+### Changed
+- **Validity meter is now period-accurate.** The bar reflects the real window for the
+  status — subscription term (`Receipt.Created → Receipt.Expires`), trial window
+  (`License.Created → TrialEndDate`), or issued file validity (`License.Updated → Expires`),
+  falling back to the publisher's `ValidDays` only when no period start is known. Previously
+  it used the product's DB-creation date, which was not a meaningful window.
+- **`MainWindow` is now a thin host of `LicenseControl`**, so the standalone-window and
+  embedded experiences are identical. The public `MainWindow.License` / `LicenseControl.License`
+  API and `LicenseViewModel.FromContext(...)` are unchanged.
+- **Register / Unregister / Error dialogs restyled** to match the card UI (bindings,
+  commands and receipt-code validation unchanged).
+
+### Fixed
+- A license check that returns `Unknown` (e.g. it threw) now shows a distinct **"Unverified"**
+  card state with a retry, instead of being conflated with the never-checked **"Not checked"**
+  state — a failed check no longer renders as a blank/unloaded card.
+
+### Notes
+- The cards load each product's status lazily (the first on open, the rest on demand) to
+  avoid a burst of server calls. No core SDK or server change is required for grouping — it
+  is purely a presentation concern over the product ids you already configure.
+
 ## [2.2.1] - 2026-06-17
 
 ### Fixed

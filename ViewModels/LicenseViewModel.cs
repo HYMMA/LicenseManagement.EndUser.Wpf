@@ -4,6 +4,7 @@ using LicenseManagement.EndUser.Wpf.Commands;
 using LicenseManagement.EndUser.Wpf.Configuration;
 using LicenseManagement.EndUser.Wpf.Views;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
@@ -30,6 +31,8 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
         private ProductViewModel _product;
         private string _customerEmail;
         private ObservableCollection<ProductViewModel> _products;
+        private ObservableCollection<ProductGroupViewModel> _productGroups;
+        private ProductLayout _layout = ProductLayout.Bands;
         private string _apiKey;
         private bool _isBusy;
 
@@ -123,8 +126,12 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
         public string VendorName
         {
             get => _vendorName;
-            set { if (_vendorName != value) { _vendorName = value; OnPropertyChanged(); } }
+            set { if (_vendorName != value) { _vendorName = value; OnPropertyChanged(); OnPropertyChanged(nameof(VendorInitial)); } }
         }
+
+        /// <summary>First letter of the vendor name, for the identity badge.</summary>
+        public string VendorInitial =>
+            string.IsNullOrWhiteSpace(_vendorName) ? "•" : _vendorName.Trim().Substring(0, 1).ToUpperInvariant();
 
         public ObservableCollection<ProductViewModel> Products
         {
@@ -143,6 +150,141 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
                     OnPropertyChanged();
                 }
             }
+        }
+
+        /// <summary>
+        /// Products arranged into developer-defined groups (e.g. Monthly / Annual) for
+        /// the card UI. Built by <see cref="ApplyGrouping(IEnumerable{ProductGroupDefinition})"/>;
+        /// the control builds a single default group if grouping is never applied.
+        /// </summary>
+        public ObservableCollection<ProductGroupViewModel> ProductGroups
+        {
+            get => _productGroups;
+            private set { if (!ReferenceEquals(_productGroups, value)) { _productGroups = value; OnPropertyChanged(); } }
+        }
+
+        /// <summary>
+        /// Arrangement used to present the product groups. Set by the integrating
+        /// developer at startup; defaults to <see cref="ProductLayout.Bands"/>.
+        /// </summary>
+        public ProductLayout Layout
+        {
+            get => _layout;
+            set { if (_layout != value) { _layout = value; OnPropertyChanged(); } }
+        }
+
+        /// <summary>True once <see cref="ProductGroups"/> has been built.</summary>
+        public bool HasGroups => _productGroups != null && _productGroups.Count > 0;
+
+        /// <summary>
+        /// Arranges <see cref="Products"/> into the supplied groups and selects the
+        /// layout. A product not named in any group falls into a trailing default group.
+        /// Safe to call with <c>null</c> to build a single default group from all products.
+        /// </summary>
+        public void ApplyGrouping(IEnumerable<ProductGroupDefinition> definitions, ProductLayout layout)
+        {
+            Layout = layout;
+            ApplyGrouping(definitions);
+        }
+
+        /// <summary>
+        /// Arranges <see cref="Products"/> into the supplied groups without changing the
+        /// current <see cref="Layout"/>.
+        /// </summary>
+        public void ApplyGrouping(IEnumerable<ProductGroupDefinition> definitions)
+        {
+            var products = Products ?? new ObservableCollection<ProductViewModel>();
+            var groups = new ObservableCollection<ProductGroupViewModel>();
+
+            var byId = new Dictionary<string, ProductViewModel>();
+            foreach (var p in products)
+                if (p.Id != null && !byId.ContainsKey(p.Id))
+                    byId[p.Id] = p;
+
+            var assigned = new HashSet<ProductViewModel>();
+
+            if (definitions != null)
+            {
+                foreach (var def in definitions)
+                {
+                    if (def == null) continue;
+                    var members = new List<ProductViewModel>();
+                    if (def.ProductIds != null)
+                    {
+                        foreach (var id in def.ProductIds)
+                        {
+                            ProductViewModel p;
+                            if (id != null && byId.TryGetValue(id, out p) && assigned.Add(p))
+                            {
+                                p.GroupKey = def.Key;
+                                members.Add(p);
+                            }
+                        }
+                    }
+                    if (members.Count > 0)
+                        groups.Add(new ProductGroupViewModel(def.Key, def.Label, def.Caption, def.Accent, members));
+                }
+            }
+
+            var leftovers = new List<ProductViewModel>();
+            foreach (var p in products)
+                if (!assigned.Contains(p))
+                    leftovers.Add(p);
+
+            if (leftovers.Count > 0)
+            {
+                // No definitions at all => one unlabeled group (just cards, no band header).
+                // Some definitions but stragglers => a trailing "Other" group.
+                var hadDefinitions = groups.Count > 0;
+                const string key = "__default";
+                foreach (var p in leftovers) p.GroupKey = key;
+                groups.Add(new ProductGroupViewModel(key, hadDefinitions ? "Other" : null, null, null, leftovers));
+            }
+
+            ProductGroups = groups;
+        }
+
+        /// <summary>
+        /// Makes <paramref name="product"/> the active card and (re)checks its license,
+        /// caching the result onto the product so its card shows live status. Called from
+        /// the card UI when a product is selected.
+        /// </summary>
+        internal void SelectProduct(ProductViewModel product, DependencyObject source)
+        {
+            if (product == null) return;
+            SetActiveProduct(product);
+            Product = product;
+            CheckLiceneFile(source);
+        }
+
+        /// <summary>
+        /// Makes <paramref name="product"/> the active card without re-checking its
+        /// license. Used by the per-card action buttons (register / unregister / renew)
+        /// so the existing commands operate on the right product.
+        /// </summary>
+        internal void MakeActive(ProductViewModel product)
+        {
+            if (product == null) return;
+            SetActiveProduct(product);
+            Product = product;
+        }
+
+        private void SetActiveProduct(ProductViewModel product)
+        {
+            if (_products == null) return;
+            foreach (var p in _products)
+                p.IsActive = ReferenceEquals(p, product);
+        }
+
+        private ProductViewModel ResolveProduct(ProductModel model)
+        {
+            if (model != null && model.Id != null && _products != null)
+            {
+                foreach (var p in _products)
+                    if (p.Id == model.Id)
+                        return p;
+            }
+            return _product;
         }
 
         public string VendorId
@@ -233,6 +375,10 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
                 LicenseOperationRunner.Run(handler, ex =>
                 {
                     UpdateFromLicenseModel(handler.HandlingContext.LicenseModel);
+                    // If the failed check left the product without a determinate status,
+                    // surface it as "Unverified" rather than an unloaded-looking card.
+                    if (_product != null && !_product.IsChecked)
+                        _product.MarkUnverified();
                     ShowErrorView(source, context.Exception ?? ex);
                 });
             }
@@ -269,13 +415,29 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
             ComputerName = model.Computer?.Name ?? ComputerName;
             VendorId = model.Product?.Vendor?.Id ?? VendorId;
             VendorName = model.Product?.Vendor?.Name ?? VendorName;
-            Product = ProductViewModel.FromProductModel(model.Product) ?? Product;
             Updated = model.Updated;
             if (model.Receipt != null)
             {
                 ReceiptCode = model.Receipt.Code;
                 ReceiptExpires = model.Receipt.Expires;
                 CustomerEmail = model.Receipt.BuyerEmail;
+            }
+
+            // Cache the resolved license onto the matching product card (rather than
+            // replacing Product with a throwaway VM) so each card keeps its own live
+            // status as the user checks different products.
+            var target = ResolveProduct(model.Product);
+            if (target != null)
+            {
+                if (model.Product != null && !string.IsNullOrEmpty(model.Product.Name))
+                    target.Name = model.Product.Name;
+                Product = target;
+                SetActiveProduct(target);
+
+                // Don't blank out a card that already has a known status when a refresh
+                // comes back with no usable result (Status.Unknown — e.g. offline / failed).
+                if (model.Status != LicenseStatusTitles.Unknown || !target.IsChecked)
+                    target.UpdateLicenseSnapshot(model, ValidDays);
             }
         }
 

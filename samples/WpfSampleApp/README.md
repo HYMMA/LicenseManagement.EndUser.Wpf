@@ -97,18 +97,23 @@ else
 ### Built-in License UI
 
 The `LicenseManagement.EndUser.Wpf` package includes pre-built windows for:
-- Viewing license details
+- Viewing license details as **grouped product cards** (v2.3+)
 - Registering a product key
 - Unregistering the computer
 
+The simplest integration sets nothing — the window loads its products, grouping and layout
+from `App.config` and checks each card on demand:
+
 ```csharp
-// Show the license management window
-var licenseWindow = new LicenseManagement.EndUser.Wpf.Views.MainWindow
-{
-    License = LicenseViewModel.FromContext(context, products)
-};
+// Show the grouped-card license window (loads products/grouping/layout from App.config)
+var licenseWindow = new LicenseManagement.EndUser.Wpf.MainWindow();
 licenseWindow.ShowDialog();
 ```
+
+This sample's `App.config` shows the `<Products>`, `<ProductGroups>` and `licenseLayout`
+settings that drive the cards. Try changing `licenseLayout` to `Lanes` or `Switcher`. To
+group in code instead, call `LicenseViewModel.ApplyGrouping(...)` before assigning `License`
+(see the main [README](../../README.md#grouped-product-cards)).
 
 ## Integration Patterns
 

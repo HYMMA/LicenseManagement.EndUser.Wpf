@@ -60,8 +60,9 @@ This package provides two ways to display license management UI:
 
 | ViewModel | Description |
 |-----------|-------------|
-| `LicenseViewModel` | License status and details |
-| `ProductViewModel` | Product information display |
+| `LicenseViewModel` | License status, products, grouping and chosen layout |
+| `ProductViewModel` | A single product card (status, validity meter, actions) |
+| `ProductGroupViewModel` | A presentation group of product cards (label, caption, accent) |
 | `RegisterLicenseViewModel` | Registration workflow logic |
 | `UnregisterViewModel` | Unregistration workflow logic |
 | `ErrorViewModel` | Error handling and display |
@@ -183,6 +184,75 @@ var licenseVm = new LicenseViewModel
     </ResourceDictionary>
 </Application.Resources>
 ```
+
+## Grouped product cards
+
+Since **v2.3.0** the license window shows each product as a **card** (instead of a dropdown),
+arranged into developer-defined **groups** — e.g. *Monthly* and *Annual* — each with its own
+colour, label and count. You pick one of three layouts; the end user cannot change it.
+
+### Layouts (`ProductLayout`)
+
+| Layout | Looks like |
+|--------|-----------|
+| `Bands` *(default)* | Full-width tinted bands stacked top to bottom |
+| `Lanes` | One coloured column per group, side by side |
+| `Switcher` | A segmented control showing one group at a time |
+
+### Group in code
+
+```csharp
+using LicenseManagement.EndUser.Wpf.Configuration;
+using LicenseManagement.EndUser.Wpf.ViewModels;
+
+license.ApplyGrouping(new[]
+{
+    new ProductGroupDefinition
+    {
+        Key = "monthly", Label = "Monthly", Caption = "Renews every month",
+        Accent = "#0E8F9C", ProductIds = { "PRD_aaa", "PRD_bbb" }
+    },
+    new ProductGroupDefinition
+    {
+        Key = "annual", Label = "Annual", Caption = "Renews once a year",
+        Accent = "#B5751A", ProductIds = { "PRD_ccc" }
+    },
+}, ProductLayout.Bands);
+```
+
+A product not named in any group falls into a trailing default group. Applying no grouping
+(or `ApplyGrouping(null)`) renders every product as cards in a single unlabeled group, so
+existing consumers keep working unchanged.
+
+### Group via App.config (zero code)
+
+Add a `<ProductGroups>` section and a `licenseLayout` setting; the control reads them
+automatically. Each entry's value is `"Label | Caption | #Accent | id1,id2,..."`.
+
+```xml
+<configSections>
+  <section name="Products" type="System.Configuration.NameValueSectionHandler" />
+  <section name="ProductGroups" type="System.Configuration.NameValueSectionHandler" />
+</configSections>
+
+<appSettings>
+  <!-- vendorId / ApiKey / publicKey / validDays as usual -->
+  <add key="licenseLayout" value="Bands" /> <!-- Bands | Lanes | Switcher -->
+</appSettings>
+
+<Products>
+  <add key="PRD_aaa" value="Product A" />
+  <add key="PRD_bbb" value="Product B" />
+  <add key="PRD_ccc" value="Product C" />
+</Products>
+
+<ProductGroups>
+  <add key="monthly" value="Monthly | Renews every month | #0E8F9C | PRD_aaa,PRD_bbb" />
+  <add key="annual"  value="Annual | Renews once a year | #B5751A | PRD_ccc" />
+</ProductGroups>
+```
+
+Grouping is purely presentational — no server or license-model change is required.
 
 ## Sample Application
 

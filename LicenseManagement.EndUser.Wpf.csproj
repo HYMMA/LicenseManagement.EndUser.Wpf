@@ -63,12 +63,15 @@
     <Compile Include="Commands\LicenseOperationRunner.cs" />
     <Compile Include="Commands\RelayCommand.cs" />
     <Compile Include="Configuration\LicenseConfigurationLoader.cs" />
+    <Compile Include="Configuration\ProductGroupDefinition.cs" />
     <Compile Include="Configuration\PublisherPreferencesFactory.cs" />
     <Compile Include="Converters\ValueConverters\UtcToLocalTimeConverter.cs" />
     <Compile Include="Rules\ReceiptCodeRule.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\LicenseViewModel.cs" />
+    <Compile Include="ViewModels\ProductLayout.cs" />
+    <Compile Include="ViewModels\ProductGroupViewModel.cs" />
     <Compile Include="ViewModels\ProductViewModel.cs" />
     <Compile Include="ViewModels\RegisterLicenseViewModel.cs" />
     <Compile Include="ViewModels\UnregisterViewModel.cs" />

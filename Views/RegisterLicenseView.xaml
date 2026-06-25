@@ -8,87 +8,76 @@
         xmlns:rules='clr-namespace:LicenseManagement.EndUser.Wpf.Rules'
         Name='thisView'
         Title="Register License"
-        Height="230"
-        Width="600">
+        FontFamily="Segoe UI"
+        SizeToContent="Height"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="White"
+        Width="460">
   <Window.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source='pack://application:,,,/LicenseManagement.EndUser.Wpf;component/AppResources.xaml' />
       </ResourceDictionary.MergedDictionaries>
       <rules:ReceiptCodeRule x:Key='ReceiptCodeRule' />
-      <!-- Window-scoped implicit overrides -->
-      <Style TargetType='StackPanel'
-             BasedOn='{StaticResource controlStackPanel}' />
-      <Style TargetType='TextBox'
-             BasedOn='{StaticResource controlTextBox}' />
-      <Style TargetType='Label'
-             BasedOn='{StaticResource controlLabel}' />
-      <Style TargetType='Button'
-             BasedOn='{StaticResource controlButton}' />
     </ResourceDictionary>
   </Window.Resources>
-  <StackPanel Orientation='Vertical'
-              Margin='{DynamicResource m-20}'>
-    <Label Content='Please enter your product key:' />
-    <StackPanel Orientation='Vertical'>
-      <TextBox x:Name='receiptCode'
-               BorderBrush='Black'
-               Validation.ErrorTemplate='{StaticResource noStylesTemplate}'
-               FontSize='16'>
-        <TextBox.Style>
-          <Style TargetType='TextBox'
-                 BasedOn='{StaticResource controlTextBox}'>
-            <Style.Triggers>
-              <Trigger Property='Validation.HasError'
-                       Value='True'>
-                <Setter Property='ToolTip'
-                        Value='{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)/ErrorContent}' />
-              </Trigger>
-            </Style.Triggers>
-          </Style>
-        </TextBox.Style>
-        <TextBox.Text>
-          <Binding Path='ReceiptCode'
-                   UpdateSourceTrigger='PropertyChanged'>
-            <Binding.ValidationRules>
-              <rules:ReceiptCodeRule />
-            </Binding.ValidationRules>
-          </Binding>
-        </TextBox.Text>
-      </TextBox>
-      <!--Error message-->
-      <Label Margin='0 0 0 0'
-             Height='32'
-             Style='{StaticResource ErrorText}'
-             Content='{Binding ElementName=receiptCode, Path=(Validation.Errors)/ErrorContent}' />
+
+  <StackPanel Margin='26,24,26,22'>
+    <!-- header -->
+    <StackPanel Orientation='Horizontal'>
+      <Border Width='38' Height='38' CornerRadius='10' VerticalAlignment='Center'>
+        <Border.Background>
+          <LinearGradientBrush StartPoint='0,0' EndPoint='1,1'>
+            <GradientStop Color='#1F2A37' Offset='0' />
+            <GradientStop Color='#36506B' Offset='1' />
+          </LinearGradientBrush>
+        </Border.Background>
+        <TextBlock Text='&#x26BF;' Foreground='White' FontSize='18' HorizontalAlignment='Center' VerticalAlignment='Center' />
+      </Border>
+      <StackPanel Margin='13,0,0,0' VerticalAlignment='Center'>
+        <TextBlock Text='Register your license' Style='{StaticResource LmHeading}' FontSize='18' />
+        <TextBlock Text='Enter the product key from your purchase receipt.' Style='{StaticResource LmCaption}' Margin='0,2,0,0' />
+      </StackPanel>
     </StackPanel>
-    <!--buttons-->
-    <StackPanel Orientation='Horizontal'
-                Margin='5,0,5,0'>
-      <Button Background='Cornsilk'
-              x:Name='Submit'
+
+    <!-- product key -->
+    <TextBlock Text='Product key' Style='{StaticResource LmCaption}' FontWeight='SemiBold'
+               Foreground='{StaticResource LmInkBrush}' Margin='0,20,0,6' />
+    <TextBox x:Name='receiptCode'
+             Style='{StaticResource LmTextBox}'
+             Validation.ErrorTemplate='{StaticResource noStylesTemplate}'>
+      <TextBox.Text>
+        <Binding Path='ReceiptCode' UpdateSourceTrigger='PropertyChanged'>
+          <Binding.ValidationRules>
+            <rules:ReceiptCodeRule />
+          </Binding.ValidationRules>
+        </Binding>
+      </TextBox.Text>
+    </TextBox>
+    <!-- validation message -->
+    <TextBlock Margin='2,7,0,0' MinHeight='18' FontSize='12' FontFamily='Segoe UI'
+               Foreground='{StaticResource LmDangerBrush}' TextWrapping='Wrap'
+               Text='{Binding ElementName=receiptCode, Path=(Validation.Errors)/ErrorContent}' />
+
+    <!-- buttons -->
+    <StackPanel Orientation='Horizontal' HorizontalAlignment='Right' Margin='0,18,0,0'>
+      <Button Content='Cancel' IsCancel='True' Style='{StaticResource LmGhostButton}' MinWidth='92' />
+      <Button x:Name='Submit'
+              Content='Register'
               Command='{Binding Register}'
               CommandParameter='{x:Reference Name=thisView}'
-              Margin='0,0,0,0'>Submit
+              Margin='10,0,0,0' MinWidth='112'>
         <Button.Style>
-          <Style TargetType='Button'
-                 BasedOn='{StaticResource controlButton}'>
+          <Style TargetType='Button' BasedOn='{StaticResource LmPrimaryButton}'>
             <Style.Triggers>
-              <MultiDataTrigger>
-                <Setter Property='IsEnabled'
-                        Value='False' />
-                <MultiDataTrigger.Conditions>
-                  <Condition Value='True'
-                             Binding='{Binding ElementName=receiptCode, Path=(Validation.HasError)}' />
-                </MultiDataTrigger.Conditions>
-              </MultiDataTrigger>
+              <DataTrigger Binding='{Binding ElementName=receiptCode, Path=(Validation.HasError)}' Value='True'>
+                <Setter Property='IsEnabled' Value='False' />
+              </DataTrigger>
             </Style.Triggers>
           </Style>
         </Button.Style>
       </Button>
-      <Button Content='Cancel'
-              IsCancel='True'
-              Margin='10,0,0,0' />
     </StackPanel>
   </StackPanel>
 </Window>

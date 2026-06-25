@@ -7,40 +7,41 @@
         mc:Ignorable="d"
         SizeToContent='Height'
         Title="Release License"
-        Height="170"
-        Width="305"
+        FontFamily="Segoe UI"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="White"
+        Width="420"
         Name='thisView'>
   <Window.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source='pack://application:,,,/LicenseManagement.EndUser.Wpf;component/AppResources.xaml' />
       </ResourceDictionary.MergedDictionaries>
-      <!-- Window-scoped implicit overrides -->
-      <Style TargetType='StackPanel'
-             BasedOn='{StaticResource controlStackPanel}' />
-      <Style TargetType='TextBox'
-             BasedOn='{StaticResource controlTextBox}' />
-      <Style TargetType='Label'
-             BasedOn='{StaticResource controlLabel}' />
-      <Style TargetType='Button'
-             BasedOn='{StaticResource controlButton}' />
     </ResourceDictionary>
   </Window.Resources>
-  <StackPanel Margin='{StaticResource m-20}'>
-    <Label>
-      <TextBlock Text='Do you want to break the link between this computer and the license?'
-                 TextWrapping='Wrap' />
-    </Label>
-    <StackPanel Orientation='Horizontal'
-                Margin='{StaticResource mt-10}'>
+
+  <StackPanel Margin='26,24,26,22'>
+    <StackPanel Orientation='Horizontal'>
+      <Border Width='38' Height='38' CornerRadius='10' VerticalAlignment='Top'
+              Background='{StaticResource LmDangerTintBrush}'>
+        <TextBlock Text='&#x21BA;' Foreground='{StaticResource LmDangerBrush}' FontSize='20'
+                   HorizontalAlignment='Center' VerticalAlignment='Center' />
+      </Border>
+      <StackPanel Margin='13,0,0,0' VerticalAlignment='Center'>
+        <TextBlock Text='Release this license?' Style='{StaticResource LmHeading}' FontSize='17' />
+        <TextBlock Style='{StaticResource LmCaption}' Margin='0,4,0,0' MaxWidth='300' HorizontalAlignment='Left'
+                   Text='This unlinks the license from this computer so you can activate it on another. You can re-register here anytime.' />
+      </StackPanel>
+    </StackPanel>
+
+    <StackPanel Orientation='Horizontal' HorizontalAlignment='Right' Margin='0,20,0,0'>
+      <Button Content='Cancel' IsCancel='True' Style='{StaticResource LmGhostButton}' MinWidth='92' />
       <Button Content='Release the license'
               Command='{Binding Unregister}'
               CommandParameter='{x:Reference Name=thisView}'
-              Foreground='DarkRed'
-              Background='Salmon' />
-      <Button Content='Cancel'
-              IsCancel='True'
-              Margin='10 16 0 0' />
+              Style='{StaticResource LmDangerButton}'
+              Margin='10,0,0,0' MinWidth='150' />
     </StackPanel>
   </StackPanel>
 </Window>

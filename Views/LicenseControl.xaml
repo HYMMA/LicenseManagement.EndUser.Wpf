@@ -7,146 +7,367 @@
              xmlns:converters='clr-namespace:LicenseManagement.EndUser.Wpf.Converters'
              DataContext='{Binding RelativeSource={RelativeSource Mode=Self}, Path=License}'
              Loaded='Control_Loaded'
+             FontFamily='Segoe UI'
              Name='thisControl'>
   <UserControl.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source='pack://application:,,,/LicenseManagement.EndUser.Wpf;component/AppResources.xaml' />
       </ResourceDictionary.MergedDictionaries>
+
       <converters:LicenseStatusConverter x:Key='LicenseStatusConverter' />
       <converters:UtcToLocalTimeConverter x:Key='UtcToLocalTimeConverter' />
+      <BooleanToVisibilityConverter x:Key='BoolToVis' />
+
+      <!-- ============================ PRODUCT CARD ============================ -->
+      <DataTemplate x:Key='LmProductCard'>
+        <Border Style='{StaticResource LmCard}' Margin='0,0,12,12' Effect='{StaticResource LmCardShadow}'>
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width='5' />
+              <ColumnDefinition Width='*' />
+            </Grid.ColumnDefinitions>
+
+            <!-- accent rail (group colour) -->
+            <Border Grid.Column='0' CornerRadius='14,0,0,14'
+                    Background='{Binding DataContext.Accent, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}' />
+
+            <StackPanel Grid.Column='1' Margin='15,14,15,13'>
+              <!-- name + status pill -->
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width='*' />
+                  <ColumnDefinition Width='Auto' />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column='0' Text='{Binding Name}' Style='{StaticResource LmHeading}'
+                           FontSize='15.5' TextWrapping='Wrap' VerticalAlignment='Center' />
+                <Border Grid.Column='1' VerticalAlignment='Center' Height='22' CornerRadius='6' Padding='10,0' Margin='8,0,0,0'
+                        Background='{Binding Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=PillBackground}'>
+                  <TextBlock VerticalAlignment='Center'
+                             Text='{Binding Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=StatusLabel}'
+                             FontSize='11' FontWeight='SemiBold'
+                             Foreground='{Binding Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=PillForeground}' />
+                </Border>
+              </Grid>
+
+              <!-- meta line -->
+              <TextBlock Style='{StaticResource LmCaption}' Margin='0,7,0,0' FontSize='12.5' Text='{Binding MetaText}' />
+
+              <!-- validity meter -->
+              <StackPanel Margin='0,12,0,0' Visibility='{Binding HasMeter, Converter={StaticResource BoolToVis}}'>
+                <ProgressBar Style='{StaticResource LmMeter}' Value='{Binding MeterFraction, Mode=OneWay}'
+                             Foreground='{Binding Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=Meter}' />
+                <Grid Margin='0,7,0,0'>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width='*' />
+                    <ColumnDefinition Width='Auto' />
+                  </Grid.ColumnDefinitions>
+                  <StackPanel Grid.Column='0' Orientation='Horizontal'>
+                    <TextBlock Style='{StaticResource LmCaption}' FontSize='11.5' Text='{Binding ExpiryCaption}' />
+                    <TextBlock Style='{StaticResource LmCaption}' FontSize='11.5' Margin='4,0,0,0'
+                               FontWeight='SemiBold' Foreground='{StaticResource LmInkBrush}' Text='{Binding PrimaryExpiryText}' />
+                  </StackPanel>
+                  <TextBlock Grid.Column='1' Text='{Binding DaysLeftText}' FontSize='11.5' FontWeight='SemiBold'
+                             Foreground='{Binding Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=Meter}' />
+                </Grid>
+              </StackPanel>
+
+              <!-- actions -->
+              <StackPanel Margin='0,13,0,0'>
+                <StackPanel Orientation='Horizontal'>
+                  <!-- Check (only before first load) -->
+                  <Button Content='Check license' Click='OnCheckClick'>
+                    <Button.Style>
+                      <Style TargetType='Button' BasedOn='{StaticResource LmPrimaryButton}'>
+                        <Setter Property='Visibility' Value='Collapsed' />
+                        <Style.Triggers>
+                          <DataTrigger Binding='{Binding IsChecked}' Value='False'>
+                            <Setter Property='Visibility' Value='Visible' />
+                          </DataTrigger>
+                        </Style.Triggers>
+                      </Style>
+                    </Button.Style>
+                  </Button>
+                  <!-- Register / activate -->
+                  <Button Content='Register' Style='{StaticResource LmAccentButton}' Click='OnRegisterClick'
+                          Background='{Binding DataContext.Accent, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}'
+                          Visibility='{Binding Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=ShowRegisterPrompt}' />
+                  <!-- Download new license file -->
+                  <Button Content='Download new file' Style='{StaticResource LmGhostButton}' Click='OnRenewClick'
+                          Visibility='{Binding Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=ShowRenewFile}' />
+                  <!-- Unregister -->
+                  <Button Content='Unregister' Style='{StaticResource LmGhostButton}' Click='OnUnregisterClick' Margin='8,0,0,0'
+                          Visibility='{Binding Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=ShowUnregister}' />
+                  <!-- Recheck (once loaded) -->
+                  <Button Content='Refresh' Click='OnCheckClick'>
+                    <Button.Style>
+                      <Style TargetType='Button' BasedOn='{StaticResource LmLinkButton}'>
+                        <Setter Property='Visibility' Value='Collapsed' />
+                        <Style.Triggers>
+                          <DataTrigger Binding='{Binding IsChecked}' Value='True'>
+                            <Setter Property='Visibility' Value='Visible' />
+                          </DataTrigger>
+                        </Style.Triggers>
+                      </Style>
+                    </Button.Style>
+                  </Button>
+                </StackPanel>
+                <!-- receipt code on its own line so long codes never crowd the buttons -->
+                <TextBlock Margin='2,9,0,0' TextTrimming='CharacterEllipsis'
+                           Text='{Binding ReceiptCode, StringFormat=Key · {0}}'>
+                  <TextBlock.Style>
+                    <Style TargetType='TextBlock' BasedOn='{StaticResource LmMono}'>
+                      <Style.Triggers>
+                        <DataTrigger Binding='{Binding ReceiptCode}' Value='{x:Null}'>
+                          <Setter Property='Visibility' Value='Collapsed' />
+                        </DataTrigger>
+                        <DataTrigger Binding='{Binding ReceiptCode}' Value=''>
+                          <Setter Property='Visibility' Value='Collapsed' />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </TextBlock.Style>
+                </TextBlock>
+              </StackPanel>
+            </StackPanel>
+          </Grid>
+        </Border>
+      </DataTemplate>
+
+      <!-- ====================== GROUP HEADER (shared bits) ===================== -->
+      <DataTemplate x:Key='LmGroupHeader'>
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width='Auto' />
+            <ColumnDefinition Width='*' />
+            <ColumnDefinition Width='Auto' />
+          </Grid.ColumnDefinitions>
+          <Border Grid.Column='0' Width='30' Height='30' CornerRadius='9' VerticalAlignment='Center'
+                  Background='White'>
+            <TextBlock Text='{Binding Initial}' Foreground='{Binding Accent}' FontWeight='Bold' FontSize='14'
+                       HorizontalAlignment='Center' VerticalAlignment='Center' />
+          </Border>
+          <StackPanel Grid.Column='1' Margin='11,0,0,0' VerticalAlignment='Center'>
+            <TextBlock Text='{Binding Label}' Style='{StaticResource LmHeading}' FontSize='14' />
+            <TextBlock Text='{Binding Caption}' Style='{StaticResource LmCaption}' FontSize='11.5' />
+          </StackPanel>
+          <Border Grid.Column='2' VerticalAlignment='Center' CornerRadius='999' Padding='9,3' Background='White'>
+            <TextBlock Text='{Binding Products.Count}' FontFamily='Consolas' FontSize='11' FontWeight='SemiBold'
+                       Foreground='{Binding Accent}' />
+          </Border>
+        </Grid>
+      </DataTemplate>
+
+      <!-- ============================ BANDS LAYOUT ============================ -->
+      <DataTemplate x:Key='LmGroupBand'>
+        <Border CornerRadius='12' BorderBrush='{StaticResource LmLineBrush}' BorderThickness='1'
+                Background='#FCFDFE' Margin='0,0,0,16' SnapsToDevicePixels='True'>
+          <DockPanel>
+            <Border DockPanel.Dock='Top' Background='{Binding AccentTint}' Padding='13,11' CornerRadius='11,11,0,0'>
+              <Border.Style>
+                <Style TargetType='Border'>
+                  <Style.Triggers>
+                    <DataTrigger Binding='{Binding Label}' Value='{x:Null}'>
+                      <Setter Property='Visibility' Value='Collapsed' />
+                    </DataTrigger>
+                    <DataTrigger Binding='{Binding Label}' Value=''>
+                      <Setter Property='Visibility' Value='Collapsed' />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Border.Style>
+              <ContentControl ContentTemplate='{StaticResource LmGroupHeader}' Content='{Binding}' />
+            </Border>
+            <ItemsControl Margin='13,13,1,1' ItemsSource='{Binding Products}' ItemTemplate='{StaticResource LmProductCard}'>
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel ItemWidth='332' />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
+          </DockPanel>
+        </Border>
+      </DataTemplate>
+
+      <!-- ============================ LANES LAYOUT ============================ -->
+      <DataTemplate x:Key='LmGroupLane'>
+        <Border CornerRadius='16' BorderBrush='{StaticResource LmLineBrush}' BorderThickness='1'
+                Background='{Binding AccentTint}' Margin='0,0,16,16' Width='332' SnapsToDevicePixels='True'
+                VerticalAlignment='Top'>
+          <StackPanel Margin='14'>
+            <ContentControl ContentTemplate='{StaticResource LmGroupHeader}' Content='{Binding}' Margin='0,0,0,12' />
+            <Border Height='1' Background='{StaticResource LmLineBrush}' Margin='0,0,0,12' />
+            <ItemsControl ItemsSource='{Binding Products}' ItemTemplate='{StaticResource LmProductCard}' />
+          </StackPanel>
+        </Border>
+      </DataTemplate>
+
+      <!-- ========================= SWITCHER (tabs) ============================ -->
+      <Style x:Key='LmSegTabItem' TargetType='TabItem'>
+        <Setter Property='Template'>
+          <Setter.Value>
+            <ControlTemplate TargetType='TabItem'>
+              <Border x:Name='b' CornerRadius='8' Margin='2' Padding='14,7' Background='Transparent'>
+                <ContentPresenter ContentSource='Header' VerticalAlignment='Center' />
+              </Border>
+              <ControlTemplate.Triggers>
+                <Trigger Property='IsSelected' Value='True'>
+                  <Setter TargetName='b' Property='Background' Value='White' />
+                  <Setter TargetName='b' Property='Effect' Value='{StaticResource LmCardShadow}' />
+                </Trigger>
+              </ControlTemplate.Triggers>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+
+      <Style x:Key='LmSwitcherTabs' TargetType='TabControl'>
+        <Setter Property='ItemContainerStyle' Value='{StaticResource LmSegTabItem}' />
+        <Setter Property='Template'>
+          <Setter.Value>
+            <ControlTemplate TargetType='TabControl'>
+              <StackPanel>
+                <Border HorizontalAlignment='Left' CornerRadius='11' Background='{StaticResource LmTrackBrush}'
+                        Padding='4' Margin='0,0,0,16'>
+                  <TabPanel IsItemsHost='True' />
+                </Border>
+                <ContentPresenter ContentSource='SelectedContent' />
+              </StackPanel>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+
+      <DataTemplate x:Key='LmSwitcherHeader'>
+        <StackPanel Orientation='Horizontal'>
+          <TextBlock Text='{Binding Label}' FontFamily='Segoe UI' FontWeight='SemiBold' FontSize='13'
+                     VerticalAlignment='Center' />
+          <Border CornerRadius='999' Background='White' Padding='6,1' Margin='8,0,0,0'>
+            <TextBlock Text='{Binding Products.Count}' FontFamily='Consolas' FontSize='10.5'
+                       Foreground='{Binding Accent}' />
+          </Border>
+        </StackPanel>
+      </DataTemplate>
+
+      <DataTemplate x:Key='LmSwitcherContent'>
+        <ItemsControl ItemsSource='{Binding Products}' ItemTemplate='{StaticResource LmProductCard}'>
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel ItemWidth='332' />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </DataTemplate>
     </ResourceDictionary>
   </UserControl.Resources>
-  <StackPanel>
-    <StackPanel Orientation='Horizontal'
-                Style='{StaticResource controlStackPanel}'>
-      <StackPanel Orientation='Horizontal'
-                  Style='{StaticResource controlStackPanel}'>
-        <Image Source='{DynamicResource license}'
-               Name='licenseImage'
-               Width='50'
-               VerticalAlignment='Top'
-               HorizontalAlignment='Right' />
-      </StackPanel>
-      <StackPanel Orientation='Vertical'
-                  Style='{StaticResource controlStackPanel}'>
-        <!--Status-->
-        <StackPanel Orientation='Horizontal'
-                    Style='{StaticResource controlStackPanel}'>
-          <Label BorderThickness='.5'
-                 BorderBrush='{Binding Path=Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=Border}'
-                 Foreground='{Binding Path=Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=Border}'
-                 Content='{Binding Path=Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=Description}'
-                 Background='{Binding Path=Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=Background}'
-                 Style='{StaticResource boldText}' />
-        </StackPanel>
-        <StackPanel Margin='0'
-                    Style='{StaticResource controlStackPanel}'
-                    Visibility='{Binding Path=Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=ShowSubscriptionPanel}'>
-          <!--customer email-->
-          <StackPanel Orientation='Horizontal'
-                      Style='{StaticResource controlStackPanel}'>
-            <Label Content='The subscription is purchased by '
-                   Style='{StaticResource grayText}' />
-            <Label Content='{Binding Path=CustomerEmail}'
-                   Style='{StaticResource boldText}' />
+
+  <Border Background='{StaticResource LmPaperBrush}'>
+    <ScrollViewer VerticalScrollBarVisibility='Auto' HorizontalScrollBarVisibility='Disabled' Padding='22'>
+      <StackPanel MaxWidth='900'>
+
+        <!-- identity (the layout is chosen by the developer, not switchable here) -->
+        <Grid Margin='0,0,0,20'>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width='Auto' />
+            <ColumnDefinition Width='*' />
+          </Grid.ColumnDefinitions>
+
+          <Border Grid.Column='0' Width='44' Height='44' CornerRadius='11' VerticalAlignment='Center'>
+            <Border.Background>
+              <LinearGradientBrush StartPoint='0,0' EndPoint='1,1'>
+                <GradientStop Color='#1F2A37' Offset='0' />
+                <GradientStop Color='#36506B' Offset='1' />
+              </LinearGradientBrush>
+            </Border.Background>
+            <TextBlock Text='{Binding VendorInitial}' Foreground='White' FontWeight='Bold' FontSize='18'
+                       HorizontalAlignment='Center' VerticalAlignment='Center' />
+          </Border>
+
+          <StackPanel Grid.Column='1' Margin='14,0,0,0' VerticalAlignment='Center'>
+            <TextBlock Text='{Binding VendorName, FallbackValue=Licenses, TargetNullValue=Licenses}'
+                       Style='{StaticResource LmHeading}' FontSize='17' />
+            <StackPanel Orientation='Horizontal' Margin='0,2,0,0'>
+              <StackPanel Orientation='Horizontal'>
+                <StackPanel.Style>
+                  <Style TargetType='StackPanel'>
+                    <Style.Triggers>
+                      <DataTrigger Binding='{Binding CustomerEmail}' Value='{x:Null}'>
+                        <Setter Property='Visibility' Value='Collapsed' />
+                      </DataTrigger>
+                      <DataTrigger Binding='{Binding CustomerEmail}' Value=''>
+                        <Setter Property='Visibility' Value='Collapsed' />
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </StackPanel.Style>
+                <TextBlock Text='{Binding CustomerEmail}' Style='{StaticResource LmCaption}' />
+                <Ellipse Width='3' Height='3' Margin='8,0,8,0' VerticalAlignment='Center' Fill='{StaticResource LmFaintBrush}' />
+              </StackPanel>
+              <TextBlock Text='{Binding Products.Count, StringFormat={}{0} products}' Style='{StaticResource LmCaption}' />
+              <Ellipse Width='3' Height='3' Margin='8,0,8,0' VerticalAlignment='Center' Fill='{StaticResource LmFaintBrush}' />
+              <TextBlock Text='{Binding ComputerName}' Style='{StaticResource LmMono}' VerticalAlignment='Center' />
+            </StackPanel>
           </StackPanel>
-          <!--Sub expiry date-->
-          <StackPanel Orientation='Horizontal'
-                      Style='{StaticResource controlStackPanel}'>
-            <Label Content='Subscription expires on: '
-                   Style='{StaticResource grayText}' />
-            <Label Content='{Binding Path=ReceiptExpires, Converter={StaticResource UtcToLocalTimeConverter}}'
-                   Style='{StaticResource boldText}' />
-          </StackPanel>
+
+        </Grid>
+
+        <!-- ===================== content: three layouts ===================== -->
+        <!-- Bands -->
+        <ItemsControl ItemsSource='{Binding ProductGroups}' ItemTemplate='{StaticResource LmGroupBand}'>
+          <ItemsControl.Style>
+            <Style TargetType='ItemsControl'>
+              <Setter Property='Visibility' Value='Collapsed' />
+              <Style.Triggers>
+                <DataTrigger Binding='{Binding Layout}' Value='Bands'>
+                  <Setter Property='Visibility' Value='Visible' />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </ItemsControl.Style>
+        </ItemsControl>
+
+        <!-- Lanes -->
+        <ItemsControl ItemsSource='{Binding ProductGroups}' ItemTemplate='{StaticResource LmGroupLane}'>
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.Style>
+            <Style TargetType='ItemsControl'>
+              <Setter Property='Visibility' Value='Collapsed' />
+              <Style.Triggers>
+                <DataTrigger Binding='{Binding Layout}' Value='Lanes'>
+                  <Setter Property='Visibility' Value='Visible' />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </ItemsControl.Style>
+        </ItemsControl>
+
+        <!-- Switcher -->
+        <TabControl ItemsSource='{Binding ProductGroups}'
+                    ItemTemplate='{StaticResource LmSwitcherHeader}' ContentTemplate='{StaticResource LmSwitcherContent}'
+                    Background='Transparent' BorderThickness='0'>
+          <TabControl.Style>
+            <Style TargetType='TabControl' BasedOn='{StaticResource LmSwitcherTabs}'>
+              <Setter Property='Visibility' Value='Collapsed' />
+              <Style.Triggers>
+                <DataTrigger Binding='{Binding Layout}' Value='Switcher'>
+                  <Setter Property='Visibility' Value='Visible' />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TabControl.Style>
+        </TabControl>
+
+        <!-- footer -->
+        <StackPanel Orientation='Horizontal' Margin='2,16,0,0'>
+          <TextBlock Text='Powered by ' Style='{StaticResource LmMono}' />
+          <TextBlock Text='License-management.com' Style='{StaticResource LmMono}' Foreground='{StaticResource LmMutedBrush}' />
         </StackPanel>
-        <!--Trial expiry date-->
-        <StackPanel Orientation='Horizontal'
-                    Style='{StaticResource controlStackPanel}'
-                    Visibility='{Binding Path=Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=ShowTrialPanel}'>
-          <Label Content='Trial expires on: '
-                 Style='{StaticResource grayText}' />
-          <Label Content='{Binding Path=TrialExpires, Converter={StaticResource UtcToLocalTimeConverter}}'
-                 Style='{StaticResource boldText}' />
-        </StackPanel>
-        <!--lic file expiry date-->
-        <StackPanel Orientation='Horizontal'
-                    Style='{StaticResource controlStackPanel}'>
-          <Label Content='License file expires on: '
-                 Style='{StaticResource grayText}' />
-          <Label Content='{Binding Path=Expires, Converter={StaticResource UtcToLocalTimeConverter}}'
-                 Style='{StaticResource boldText}' />
-        </StackPanel>
-        <!--computer name-->
-        <StackPanel Orientation='Horizontal'
-                    Style='{StaticResource controlStackPanel}'>
-          <Label Content='Computer: '
-                 Style='{StaticResource grayText}' />
-          <Label Content='{Binding Path=ComputerName}'
-                 Style='{StaticResource boldText}' />
-        </StackPanel>
-        <!--Products dropdown -->
-        <StackPanel Orientation='Horizontal'
-                    Style='{StaticResource controlStackPanel}'>
-          <Label Content='Product: '
-                 Style='{StaticResource grayText}' />
-          <ComboBox ItemsSource='{Binding Path=Products}'
-                    SelectionChanged='OnProductsSelectionChanged'
-                    x:Name='productsComboBox'
-                    SelectedItem='{Binding Product}'>
-            <ComboBox.ItemTemplate>
-              <DataTemplate>
-                <TextBlock Text="{Binding Path=Name}"
-                           Padding="5" />
-              </DataTemplate>
-            </ComboBox.ItemTemplate>
-          </ComboBox>
-        </StackPanel>
-        <!--Vendor-->
-        <StackPanel Orientation='Horizontal'
-                    Style='{StaticResource controlStackPanel}'>
-          <Label Content='Vendor: '
-                 Style='{StaticResource grayText}' />
-          <Label Content='{Binding Path=VendorName}'
-                 Style='{StaticResource boldText}' />
-        </StackPanel>
-        <!--Unregister-->
-        <StackPanel Orientation='Horizontal'
-                    Style='{StaticResource controlStackPanel}'
-                    Visibility='{Binding Path=Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=ShowUnregister}'>
-          <Button Content='Unregister'
-                  Style='{StaticResource controlButton}'
-                  CommandParameter='{x:Reference Name=thisControl}'
-                  Command='{Binding ShowUnregisterView}' />
-        </StackPanel>
-        <!--Renew License-->
-        <StackPanel Orientation='Horizontal'
-                    Style='{StaticResource controlStackPanel}'
-                    Visibility='{Binding Path=Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=ShowRenewFile}'>
-          <Button Content='Download new file'
-                  Style='{StaticResource controlButton}'
-                  CommandParameter='{x:Reference Name=thisControl}'
-                  Command='{Binding Path=RenewLicenseFile}' />
-        </StackPanel>
-        <!--product key-->
-        <StackPanel Orientation='Horizontal'
-                    Style='{StaticResource controlStackPanel}'>
-          <Button Visibility='{Binding Path=Status, Converter={StaticResource LicenseStatusConverter}, ConverterParameter=ShowRegisterPrompt}'
-                  Style='{StaticResource controlButton}'
-                  Command='{Binding ShowRegisterView}'
-                  CommandParameter='{x:Reference Name=thisControl}'>Register</Button>
-        </StackPanel>
+
       </StackPanel>
-    </StackPanel>
-    <StackPanel Orientation='Horizontal'
-                Style='{StaticResource controlStackPanel}'>
-      <Label Style='{StaticResource grayText}'
-             FontSize='10'
-             Content='Powered by ' />
-      <Label Style='{StaticResource grayText}'
-             FontWeight='Medium'
-             FontSize='10'
-             Content='License-management.com' />
-    </StackPanel>
-  </StackPanel>
+    </ScrollViewer>
+  </Border>
 </UserControl>

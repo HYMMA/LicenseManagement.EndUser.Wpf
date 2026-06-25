@@ -3,13 +3,13 @@ using LicenseManagement.EndUser.Wpf.ViewModels;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
+using System.Windows.Input;
 
 namespace LicenseManagement.EndUser.Wpf.Views
 {
     /// <summary>
-    /// A UserControl for displaying and managing license information.
-    /// Can be embedded directly in any WPF application.
+    /// A UserControl for displaying and managing license information as grouped product
+    /// cards. Can be embedded directly in any WPF application.
     /// </summary>
     /// <example>
     /// XAML usage:
@@ -49,31 +49,51 @@ namespace LicenseManagement.EndUser.Wpf.Views
         }
         #endregion
 
-        private void OnProductsSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count > 0)
-            {
-                License?.CheckLiceneFile(this);
-            }
-        }
-
         private void Control_Loaded(object sender, RoutedEventArgs e)
         {
             Loaded -= Control_Loaded;
 
-            if (productsComboBox.Items.Count > 0)
-                productsComboBox.SelectedIndex = 0;
+            var vm = License;
+            if (vm == null) return;
 
-            if (licenseImage.Source == null)
-            {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri("pack://application:,,,/LicenseManagement.EndUser.Wpf;component/Assets/license.png", UriKind.Absolute);
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-                bitmap.Freeze();
-                licenseImage.Source = bitmap;
-            }
+            // Build a default single group if the developer never applied grouping,
+            // so existing app-settings consumers still render as cards.
+            if (vm.ProductGroups == null)
+                vm.ApplyGrouping(null);
+
+            // Check the first product so its card shows live status on open (mirrors the
+            // old dropdown selecting index 0). Other cards load when the user opens them.
+            // Skip when it is already checked or when no API key is configured (designer /
+            // unconfigured host) so we never fire a pointless server call on launch.
+            var first = vm.Products != null && vm.Products.Count > 0 ? vm.Products[0] : null;
+            if (first != null && !first.IsChecked && vm.HasApiKey)
+                vm.SelectProduct(first, this);
+        }
+
+        private void OnCheckClick(object sender, RoutedEventArgs e)
+        {
+            var product = (sender as FrameworkElement)?.DataContext as ProductViewModel;
+            if (product != null)
+                License?.SelectProduct(product, this);
+        }
+
+        private void OnRegisterClick(object sender, RoutedEventArgs e) =>
+            InvokeOnProduct(sender, License?.ShowRegisterView);
+
+        private void OnUnregisterClick(object sender, RoutedEventArgs e) =>
+            InvokeOnProduct(sender, License?.ShowUnregisterView);
+
+        private void OnRenewClick(object sender, RoutedEventArgs e) =>
+            InvokeOnProduct(sender, License?.RenewLicenseFile);
+
+        private void InvokeOnProduct(object sender, ICommand command)
+        {
+            var product = (sender as FrameworkElement)?.DataContext as ProductViewModel;
+            if (product == null || License == null || command == null) return;
+
+            License.MakeActive(product);
+            if (command.CanExecute(this))
+                command.Execute(this);
         }
     }
 }

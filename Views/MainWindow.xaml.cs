@@ -1,14 +1,12 @@
 using LicenseManagement.EndUser.Wpf.Configuration;
 using LicenseManagement.EndUser.Wpf.ViewModels;
-using System;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 
 namespace LicenseManagement.EndUser.Wpf
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Standalone license window. A thin host around
+    /// <see cref="Views.LicenseControl"/> — all UI and behaviour live in the control.
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -39,32 +37,5 @@ namespace LicenseManagement.EndUser.Wpf
             // dependency property already stores the new value; nothing extra to do
         }
         #endregion
-
-        private void OnProductsSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count > 0)
-            {
-                License?.CheckLiceneFile(this);
-            }
-        }
-
-        private void thisView_Loaded(object sender, RoutedEventArgs e)
-        {
-            Loaded -= thisView_Loaded;
-
-            if (productsComboBox.Items.Count > 0)
-                productsComboBox.SelectedIndex = 0;
-
-            if (licenseImage.Source == null)
-            {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri("pack://application:,,,/LicenseManagement.EndUser.Wpf;component/Assets/license.png", UriKind.Absolute);
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-                bitmap.Freeze();
-                licenseImage.Source = bitmap;
-            }
-        }
     }
 }

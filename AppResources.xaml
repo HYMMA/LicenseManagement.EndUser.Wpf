@@ -113,4 +113,235 @@
       <AdornedElementPlaceholder />
     </StackPanel>
   </ControlTemplate>
+
+  <!-- ================================================================= -->
+  <!--  Card UI theme. Every key is prefixed "Lm" and applied explicitly  -->
+  <!--  so merging this dictionary never restyles a host application's     -->
+  <!--  own controls.                                                      -->
+  <!-- ================================================================= -->
+  <SolidColorBrush x:Key="LmInkBrush" Color="#16202B" />
+  <SolidColorBrush x:Key="LmPaperBrush" Color="#EEF1F5" />
+  <SolidColorBrush x:Key="LmCardBrush" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="LmLineBrush" Color="#E2E8F0" />
+  <SolidColorBrush x:Key="LmHoverLineBrush" Color="#CBD5E1" />
+  <SolidColorBrush x:Key="LmMutedBrush" Color="#64748B" />
+  <SolidColorBrush x:Key="LmFaintBrush" Color="#94A3B8" />
+  <SolidColorBrush x:Key="LmTrackBrush" Color="#EDF1F5" />
+  <SolidColorBrush x:Key="LmDangerBrush" Color="#B91C1C" />
+  <SolidColorBrush x:Key="LmDangerTintBrush" Color="#FBEAEA" />
+
+  <FontFamily x:Key="LmUiFont">Segoe UI</FontFamily>
+  <FontFamily x:Key="LmMonoFont">Consolas</FontFamily>
+
+  <DropShadowEffect x:Key="LmCardShadow" Color="#16202B" BlurRadius="22" ShadowDepth="3"
+                    Direction="270" Opacity="0.13" RenderingBias="Performance" />
+
+  <!-- Text -->
+  <Style x:Key="LmHeading" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource LmUiFont}" />
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource LmInkBrush}" />
+  </Style>
+  <Style x:Key="LmCaption" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource LmUiFont}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Foreground" Value="{StaticResource LmMutedBrush}" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+  <Style x:Key="LmMono" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource LmMonoFont}" />
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="Foreground" Value="{StaticResource LmFaintBrush}" />
+  </Style>
+
+  <!-- Primary (ink) button -->
+  <Style x:Key="LmPrimaryButton" TargetType="Button">
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="Background" Value="{StaticResource LmInkBrush}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="FontFamily" Value="{StaticResource LmUiFont}" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Padding" Value="14,8" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="SnapsToDevicePixels" Value="True" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="bd" CornerRadius="9" Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="bd" Property="Opacity" Value="0.9" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="bd" Property="Opacity" Value="0.4" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Accent button: same as primary but the caller sets Background to the group accent. -->
+  <Style x:Key="LmAccentButton" TargetType="Button" BasedOn="{StaticResource LmPrimaryButton}" />
+
+  <!-- Ghost button: white with a hairline border -->
+  <Style x:Key="LmGhostButton" TargetType="Button">
+    <Setter Property="Foreground" Value="{StaticResource LmInkBrush}" />
+    <Setter Property="Background" Value="White" />
+    <Setter Property="BorderBrush" Value="{StaticResource LmLineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="FontFamily" Value="{StaticResource LmUiFont}" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Padding" Value="13,7" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="SnapsToDevicePixels" Value="True" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="bd" CornerRadius="9" Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource LmHoverLineBrush}" />
+              <Setter TargetName="bd" Property="Background" Value="#F8FAFC" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="bd" Property="Opacity" Value="0.5" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Danger ghost button (e.g. release / unregister) -->
+  <Style x:Key="LmDangerButton" TargetType="Button" BasedOn="{StaticResource LmGhostButton}">
+    <Setter Property="Foreground" Value="{StaticResource LmDangerBrush}" />
+    <Setter Property="Background" Value="{StaticResource LmDangerTintBrush}" />
+    <Setter Property="BorderBrush" Value="#F3C9C9" />
+  </Style>
+
+  <!-- Link / tertiary button -->
+  <Style x:Key="LmLinkButton" TargetType="Button">
+    <Setter Property="Foreground" Value="{StaticResource LmMutedBrush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="FontFamily" Value="{StaticResource LmUiFont}" />
+    <Setter Property="FontSize" Value="12.5" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Padding" Value="6,7" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border Background="Transparent" Padding="{TemplateBinding Padding}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter Property="Foreground" Value="{StaticResource LmInkBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter Property="Opacity" Value="0.5" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Validity meter (thin progress bar, 0..1) -->
+  <Style x:Key="LmMeter" TargetType="ProgressBar">
+    <Setter Property="Minimum" Value="0" />
+    <Setter Property="Maximum" Value="1" />
+    <Setter Property="Height" Value="6" />
+    <Setter Property="Background" Value="{StaticResource LmTrackBrush}" />
+    <Setter Property="Foreground" Value="#15803D" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ProgressBar">
+          <Border CornerRadius="3" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+            <Grid x:Name="PART_Track" ClipToBounds="True">
+              <Border x:Name="PART_Indicator" HorizontalAlignment="Left" CornerRadius="3"
+                      Background="{TemplateBinding Foreground}" />
+            </Grid>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Card container -->
+  <Style x:Key="LmCard" TargetType="Border">
+    <Setter Property="Background" Value="White" />
+    <Setter Property="BorderBrush" Value="{StaticResource LmLineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="SnapsToDevicePixels" Value="True" />
+  </Style>
+
+  <!-- Rounded text box -->
+  <Style x:Key="LmTextBox" TargetType="TextBox">
+    <Setter Property="FontFamily" Value="{StaticResource LmUiFont}" />
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="Foreground" Value="{StaticResource LmInkBrush}" />
+    <Setter Property="CaretBrush" Value="{StaticResource LmInkBrush}" />
+    <Setter Property="Background" Value="White" />
+    <Setter Property="BorderBrush" Value="{StaticResource LmLineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="12,10" />
+    <Setter Property="SnapsToDevicePixels" Value="True" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="TextBox">
+          <Border x:Name="bd" CornerRadius="10" Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                  Padding="{TemplateBinding Padding}">
+            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" />
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource LmInkBrush}" />
+            </Trigger>
+            <Trigger Property="Validation.HasError" Value="True">
+              <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource LmDangerBrush}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Small segmented button (layout preview switcher / Switcher tabs) -->
+  <Style x:Key="LmSegButtonBase" TargetType="Button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource LmMutedBrush}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="FontFamily" Value="{StaticResource LmUiFont}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Padding" Value="11,6" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="b" CornerRadius="7" Background="{TemplateBinding Background}"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
 </ResourceDictionary>

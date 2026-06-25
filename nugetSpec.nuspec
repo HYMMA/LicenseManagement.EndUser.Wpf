@@ -2,13 +2,13 @@
 <package>
 	<metadata minClientVersion="2.5">
 		<id>LicenseManagement.EndUser.Wpf</id>
-		<version>2.2.1</version>
+		<version>2.3.0</version>
 		<authors>HYMMA</authors>
 		<owners>HYMMA</owners>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<license type="expression">MIT</license>
 		<description>WPF UI components for license-management.com end-user SDK. Provides ready-to-use Window and UserControl components, view models, and converters for license registration and management workflows. Bundles all required dependencies for easy deployment.</description>
-		<releaseNotes>2.1.0: Bumps dependency to LicenseManagement.EndUser 3.0.1 (tamper detection fix, uninstall reads from disk). Adds unit test project for ViewModels.</releaseNotes>
+		<releaseNotes>2.3.0: Redesigned license UI — products now render as grouped cards (replacing the dropdown), with a developer-selectable layout (Bands / Lanes / Switcher) and per-card status, validity meter and actions. Group products via LicenseViewModel.ApplyGrouping(...) or the App.config &lt;ProductGroups&gt; / licenseLayout settings. Register / Unregister / Error dialogs restyled to match. Validity meter is now based on the real license period (subscription term / trial window / file validity). A check that returns Unknown shows a distinct "Unverified" state instead of looking unloaded. Existing LicenseViewModel.License / FromContext usage is unchanged.</releaseNotes>
 		<projectUrl>https://github.com/HYMMA/LicenseManagement.EndUser.Wpf</projectUrl>
 		<repository type="git" url="https://github.com/HYMMA/LicenseManagement.EndUser.Wpf.git" />
 		<readme>README.md</readme>

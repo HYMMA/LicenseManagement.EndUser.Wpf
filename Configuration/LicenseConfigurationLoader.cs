@@ -1,5 +1,6 @@
 using LicenseManagement.EndUser.Wpf.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Configuration;
@@ -51,6 +52,12 @@ namespace LicenseManagement.EndUser.Wpf.Configuration
                     }
                 }
                 vm.Product = vm.Products.FirstOrDefault();
+
+                // Optional, zero-code grouping + layout (developer config at startup).
+                // With no <ProductGroups> section every product falls into one default
+                // group, so existing consumers keep working unchanged.
+                var layout = ParseLayout(ConfigurationManager.AppSettings.Get("licenseLayout"));
+                vm.ApplyGrouping(ReadGroupDefinitions(), layout);
                 return vm;
             }
             catch (ConfigurationErrorsException ex)
@@ -58,6 +65,50 @@ namespace LicenseManagement.EndUser.Wpf.Configuration
                 Trace.TraceWarning($"LicenseConfigurationLoader: failed to read app settings — {ex.Message}");
                 return null;
             }
+        }
+
+        private static ProductLayout ParseLayout(string value)
+        {
+            ProductLayout layout;
+            return Enum.TryParse(value, ignoreCase: true, result: out layout)
+                ? layout
+                : ProductLayout.Bands;
+        }
+
+        /// <summary>
+        /// Reads an optional &lt;ProductGroups&gt; NameValueCollection section. Each entry is
+        /// <c>groupKey = "Label | Caption | #Accent | id1,id2,id3"</c>. Returns <c>null</c>
+        /// when the section is absent.
+        /// </summary>
+        private static IEnumerable<ProductGroupDefinition> ReadGroupDefinitions()
+        {
+            var section = (NameValueCollection)ConfigurationManager.GetSection("ProductGroups");
+            if (section == null)
+                return null;
+
+            var defs = new List<ProductGroupDefinition>();
+            foreach (var key in section.AllKeys)
+            {
+                var parts = (section[key] ?? string.Empty).Split('|');
+                var def = new ProductGroupDefinition
+                {
+                    Key = key,
+                    Label = parts.Length > 0 ? parts[0].Trim() : key,
+                    Caption = parts.Length > 1 ? parts[1].Trim() : null,
+                    Accent = parts.Length > 2 ? parts[2].Trim() : null,
+                };
+                if (parts.Length > 3)
+                {
+                    foreach (var id in parts[3].Split(','))
+                    {
+                        var trimmed = id.Trim();
+                        if (trimmed.Length > 0)
+                            def.ProductIds.Add(trimmed);
+                    }
+                }
+                defs.Add(def);
+            }
+            return defs;
         }
     }
 }

@@ -6,61 +6,48 @@
         xmlns:local="clr-namespace:LicenseManagement.EndUser.Wpf.Views"
         mc:Ignorable="d"
         Title="Error"
-        Height="300"
-        Width="600"
-        BorderBrush='Black'>
+        FontFamily="Segoe UI"
+        SizeToContent="Height"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="White"
+        Width="480">
   <Window.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source='pack://application:,,,/LicenseManagement.EndUser.Wpf;component/AppResources.xaml' />
       </ResourceDictionary.MergedDictionaries>
-      <!-- Window-scoped implicit overrides -->
-      <Style TargetType='StackPanel'
-             BasedOn='{StaticResource controlStackPanel}' />
-      <Style TargetType='TextBox'
-             BasedOn='{StaticResource controlTextBox}' />
-      <Style TargetType='Label'
-             BasedOn='{StaticResource controlLabel}' />
-      <Style TargetType='Button'
-             BasedOn='{StaticResource controlButton}' />
     </ResourceDictionary>
   </Window.Resources>
-  <Grid Background='WhiteSmoke'>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width='150' />
-      <ColumnDefinition Width='3*' />
-      <ColumnDefinition Width='200' />
-    </Grid.ColumnDefinitions>
-    <Grid.RowDefinitions>
-      <RowDefinition Height='150' />
-      <RowDefinition Height='*' />
-      <RowDefinition Height='auto' />
-    </Grid.RowDefinitions>
-    <Image Margin='16'
-           Source='{StaticResource error}'
-           Grid.Column='0'
-           Grid.Row='0' />
-    <StackPanel Margin='{StaticResource m-20}'
-                Grid.Column='1'
-                Grid.ColumnSpan='2'
-                Grid.RowSpan='2'>
-      <TextBlock Text='{Binding Path=Message}'
-                 Style='{StaticResource ErrorText}'
-                 TextWrapping='Wrap' />
-      <TextBlock Margin='30 0 0 0'
-                 Text='{Binding Path=InnerException.Message, FallbackValue=""}'
-                 Style='{StaticResource ErrorText}'
-                 TextWrapping='Wrap' />
-      <TextBlock Margin='60 0 0 0'
-                 Text='{Binding Path=InnerException.InnerException.Message, FallbackValue=""}'
-                 Style='{StaticResource ErrorText}'
-                 TextWrapping='Wrap' />
+
+  <StackPanel Margin='26,24,26,22'>
+    <StackPanel Orientation='Horizontal'>
+      <Border Width='38' Height='38' CornerRadius='10' VerticalAlignment='Top'
+              Background='{StaticResource LmDangerTintBrush}'>
+        <TextBlock Text='!' Foreground='{StaticResource LmDangerBrush}' FontSize='22' FontWeight='Bold'
+                   HorizontalAlignment='Center' VerticalAlignment='Center' />
+      </Border>
+      <StackPanel Margin='13,0,0,0' VerticalAlignment='Center'>
+        <TextBlock Text='Something went wrong' Style='{StaticResource LmHeading}' FontSize='17' />
+        <TextBlock Text='The license operation could not be completed.' Style='{StaticResource LmCaption}' Margin='0,2,0,0' />
+      </StackPanel>
     </StackPanel>
-    <Button IsCancel='True'
-            Width='150'
-            Margin='{StaticResource m-10}'
-            Grid.Row='2'
-            Grid.Column='2'
-            Content='Ok' />
-  </Grid>
+
+    <!-- error detail -->
+    <Border Margin='0,18,0,0' CornerRadius='10' Background='#FCFDFE'
+            BorderBrush='{StaticResource LmLineBrush}' BorderThickness='1' Padding='14,12'>
+      <StackPanel>
+        <TextBlock Text='{Binding Path=Message}' Foreground='{StaticResource LmInkBrush}'
+                   FontSize='13' TextWrapping='Wrap' />
+        <TextBlock Margin='0,8,0,0' Text='{Binding Path=InnerException.Message, FallbackValue={x:Null}}'
+                   Style='{StaticResource LmCaption}' TextWrapping='Wrap' />
+        <TextBlock Margin='0,6,0,0' Text='{Binding Path=InnerException.InnerException.Message, FallbackValue={x:Null}}'
+                   Style='{StaticResource LmCaption}' TextWrapping='Wrap' />
+      </StackPanel>
+    </Border>
+
+    <StackPanel Orientation='Horizontal' HorizontalAlignment='Right' Margin='0,18,0,0'>
+      <Button Content='OK' IsCancel='True' IsDefault='True' Style='{StaticResource LmPrimaryButton}' MinWidth='110' />
+    </StackPanel>
+  </StackPanel>
 </Window>
