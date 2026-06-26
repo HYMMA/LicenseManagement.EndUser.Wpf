@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.4] - 2026-06-26
+
+First public release since 2.3.0 — fixes the empty-window regression and several UI issues
+from the grouped-cards redesign.
+
+### Fixed
+- **`MainWindow` rendered empty when `License` was assigned in code.** The window hosted
+  `LicenseControl` with a bare `License='{Binding}'`, which resolved against the control's
+  own self-bound `DataContext` (stuck at the `LicenseConfigurationLoader.TryLoad()` default),
+  so a `window.License` set in code never reached the control. It now binds directly to the
+  window's `License`. (The sample app was unaffected because it populates products via the
+  default value / App.config rather than assigning `License`.)
+- **Cards no longer sit at a fixed 332px with dead space on the right.** The Bands and
+  Switcher layouts lay cards out in a stretch-to-fill grid and the content cap was widened, so
+  cards grow with the window.
+- **Buttons were inert** — added real hover and pressed states to the primary, ghost and link
+  button styles (previously only a faint hover and no pressed feedback).
+- **Window could freeze briefly on open.** Reading a licence runs on the UI thread and, for
+  non-valid states, reaches the licence server; reading every card synchronously on open left
+  the window painted but unresponsive for a beat (see the async-loading change below).
+- **Validity meter could read ~0% with weeks left.** A `default(DateTime)` period-start date
+  from the model was used as a real window start, making the window span ~2000 years. Such
+  dates are now treated as unknown, falling back to the publisher's `ValidDays`.
+
+### Changed
+- **Cards load asynchronously with a per-card spinner.** Each not-yet-loaded card is read in
+  the background (off the UI thread, one at a time so reads never race on the licence file)
+  while showing a "Checking license…" spinner, so the window paints immediately. The per-card
+  Check / Refresh action and the post-Register / post-Unregister refresh use the same path. A
+  host that has already validated its products can seed the cards directly via
+  `ProductViewModel.UpdateLicenseSnapshot(model, validDays)` so they appear instantly.
+- **Clearer per-status labels.** `Unknown` → **"Couldn't verify"**, `Expired` → **"File
+  Expired"**, `ReceiptExpired` → **"Subscription Ended"**, `ReceiptUnregistered` → **"Computer
+  Unregistered"** (with the matching meta line).
+
+### Added
+- `ProductViewModel.IsLoading` and `LicenseViewModel.LoadAllProducts(...)` /
+  `RefreshProduct(...)` for the async, spinner-driven loading; an `LmSpinner` style.
+
 ## [2.3.0] - 2026-06-25
 
 ### Added

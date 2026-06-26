@@ -15,5 +15,9 @@
         Name='thisView'>
   <!-- The window is a thin host; all UI lives in the reusable LicenseControl so the
        embedded and standalone-window experiences stay identical. -->
-  <views:LicenseControl License='{Binding}' />
+  <!-- Bind the control's License directly to the window's License. A bare {Binding} would
+       resolve against the control's own DataContext, which self-binds to its License default
+       (LicenseConfigurationLoader.TryLoad()), so a window.License set in code never reached
+       the control — the window rendered the empty default instead. -->
+  <views:LicenseControl License='{Binding License, ElementName=thisView}' />
 </Window>

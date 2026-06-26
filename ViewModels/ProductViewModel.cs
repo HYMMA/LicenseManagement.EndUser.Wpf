@@ -93,6 +93,17 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
             set { if (_isActive != value) { _isActive = value; OnPropertyChanged(); } }
         }
 
+        private bool _isLoading;
+        /// <summary>
+        /// True while this card is fetching its licence state from the SDK. Drives the
+        /// per-card spinner so the user sees work happening during the (async) read.
+        /// </summary>
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set { if (_isLoading != value) { _isLoading = value; OnPropertyChanged(); } }
+        }
+
         /// <summary>
         /// This product's license status, or <c>null</c> until it has been checked.
         /// Setting any snapshot value refreshes the computed card values.
@@ -293,7 +304,7 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
                     case LicenseStatusTitles.ReceiptExpired:
                         return "Subscription needs renewal";
                     case LicenseStatusTitles.ReceiptUnregistered:
-                        return "Not registered on this computer";
+                        return "This computer has been unregistered";
                     case LicenseStatusTitles.Unknown:
                         return "Couldn't verify — check your connection and try again";
                     default:
@@ -326,18 +337,22 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
 
             Status = model.Status;
             Expires = model.Expires;
-            _licenseCreated = model.Created;
-            _licenseUpdated = model.Updated;
+            // Period-start dates feed the validity-meter window. A server model can leave any
+            // of these as default(DateTime) (0001-01-01); used as-is the window spans ~2000
+            // years, so the meter reads ~0% even with weeks left. Treat default as unknown
+            // (null) — WindowStart then falls back to the publisher's ValidDays.
+            _licenseCreated = NullIfDefault(model.Created);
+            _licenseUpdated = NullIfDefault(model.Updated);
             _validDays = validDays;
 
             var receipt = model.Receipt;
-            _receiptCreated = receipt != null ? receipt.Created : null;
+            _receiptCreated = receipt != null ? NullIfDefault(receipt.Created) : null;
             ReceiptExpires = receipt != null ? receipt.Expires : null;
             CustomerEmail = receipt != null ? receipt.BuyerEmail : null;
             ReceiptCode = receipt != null ? receipt.Code : null;
 
             // TrialEndDate is non-nullable on the model; treat the default as "no trial".
-            TrialExpires = model.TrialEndDate == default(DateTime) ? (DateTime?)null : model.TrialEndDate;
+            TrialExpires = NullIfDefault(model.TrialEndDate);
 
             RaiseComputed();
         }
@@ -368,6 +383,11 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
             OnPropertyChanged(nameof(DaysLeftText));
             OnPropertyChanged(nameof(MetaText));
         }
+
+        /// <summary>Treats <c>default(DateTime)</c> (0001-01-01) as "no date" so a missing
+        /// server date never produces a meaningless multi-century validity window.</summary>
+        private static DateTime? NullIfDefault(DateTime? value) =>
+            (value == null || value.Value == default(DateTime)) ? (DateTime?)null : value;
 
         private static DateTime ToUtc(DateTime dt)
         {

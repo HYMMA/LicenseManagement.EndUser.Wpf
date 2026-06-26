@@ -61,20 +61,21 @@ namespace LicenseManagement.EndUser.Wpf.Views
             if (vm.ProductGroups == null)
                 vm.ApplyGrouping(null);
 
-            // Check the first product so its card shows live status on open (mirrors the
-            // old dropdown selecting index 0). Other cards load when the user opens them.
-            // Skip when it is already checked or when no API key is configured (designer /
-            // unconfigured host) so we never fire a pointless server call on launch.
-            var first = vm.Products != null && vm.Products.Count > 0 ? vm.Products[0] : null;
-            if (first != null && !first.IsChecked && vm.HasApiKey)
-                vm.SelectProduct(first, this);
+            if (vm.Products == null || vm.Products.Count == 0 || !vm.HasApiKey)
+                return;
+
+            // Read every not-yet-loaded card's licence in the BACKGROUND, each showing its own
+            // spinner while it loads. The reads run off the UI thread (and one at a time, so
+            // they don't race on the licence file), so the window paints immediately instead of
+            // freezing. Cards the host already seeded are skipped.
+            vm.LoadAllProducts(this);
         }
 
         private void OnCheckClick(object sender, RoutedEventArgs e)
         {
             var product = (sender as FrameworkElement)?.DataContext as ProductViewModel;
             if (product != null)
-                License?.SelectProduct(product, this);
+                License?.RefreshProduct(product, this);   // async; shows the card spinner
         }
 
         private void OnRegisterClick(object sender, RoutedEventArgs e) =>

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml.Serialization;
@@ -364,6 +365,82 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
 
         public string PublicKey { get; internal set; }
 
+        /// <summary>
+        /// Loads every not-yet-loaded product's licence state in the background, showing a
+        /// per-card spinner while each read runs. Reads are awaited one at a time so they
+        /// never race on the licence file, and so the UI thread stays free (the window paints
+        /// immediately and the spinners animate). Cards already seeded with a status by the
+        /// host are left untouched.
+        /// </summary>
+        public async void LoadAllProducts(object source)
+        {
+            if (_products == null) return;
+            var src = source as DependencyObject;
+
+            var pending = new List<ProductViewModel>();
+            foreach (var product in _products)
+            {
+                if (!product.IsChecked)
+                {
+                    product.IsLoading = true;   // show all spinners up front
+                    pending.Add(product);
+                }
+            }
+
+            foreach (var product in pending)
+            {
+                try { await LoadProductCoreAsync(product, src); }
+                finally { product.IsLoading = false; }
+            }
+        }
+
+        /// <summary>
+        /// Re-reads a single product's licence (per-card Check / Refresh action), showing its
+        /// spinner while the async read runs.
+        /// </summary>
+        public async void RefreshProduct(ProductViewModel product, object source)
+        {
+            if (product == null) return;
+            MakeActive(product);
+            product.IsLoading = true;
+            try { await LoadProductCoreAsync(product, source as DependencyObject); }
+            finally { product.IsLoading = false; }
+        }
+
+        /// <summary>
+        /// Reads one product's licence off the UI thread and applies the result to that card
+        /// only (without changing which card is active), so several cards can load without the
+        /// active selection flickering.
+        /// </summary>
+        private async Task LoadProductCoreAsync(ProductViewModel product, DependencyObject source)
+        {
+            var prefs = PublisherPreferencesFactory.Build(VendorId, product.Id, _apiKey, PublicKey, ValidDays);
+            var context = new LicHandlingContext(prefs);
+            var handler = new LicenseHandlingLaunch(context, OnLicenseHandledSuccessfully: null);
+
+            Exception error = null;
+            await Task.Run(() =>
+            {
+                try { handler.HandleLicense(); }
+                catch (Exception ex) { error = ex; }
+            });
+
+            var model = handler.HandlingContext.LicenseModel;
+            if (error == null && model != null)
+            {
+                if (model.Product != null && !string.IsNullOrEmpty(model.Product.Name))
+                    product.Name = model.Product.Name;
+                product.UpdateLicenseSnapshot(model, ValidDays);
+            }
+            else
+            {
+                if (!product.IsChecked)
+                    product.MarkUnverified();
+                if (error != null)
+                    ShowErrorView(source, context.Exception ?? error);
+            }
+        }
+
         public void CheckLiceneFile(object obj)
         {
             var source = obj as DependencyObject;
@@ -464,7 +541,7 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
             onClosed = (s, e) =>
             {
                 view.Closed -= onClosed;
-                CheckLiceneFile(source ?? owner);
+                RefreshProduct(Product, source ?? owner);   // async refresh with the card spinner
             };
             view.Closed += onClosed;
             view.ShowDialog();
@@ -492,7 +569,7 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
             onClosed = (s, e) =>
             {
                 view.Closed -= onClosed;
-                CheckLiceneFile(source ?? owner);
+                RefreshProduct(Product, source ?? owner);   // async refresh with the card spinner
             };
             view.Closed += onClosed;
             view.ShowDialog();

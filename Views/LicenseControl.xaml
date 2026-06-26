@@ -130,6 +130,16 @@
                 </TextBlock>
               </StackPanel>
             </StackPanel>
+
+            <!-- per-card loading veil + spinner, shown while this card's licence is read -->
+            <Border Grid.ColumnSpan='2' CornerRadius='14' Background='#E6FFFFFF'
+                    Visibility='{Binding IsLoading, Converter={StaticResource BoolToVis}}'>
+              <StackPanel Orientation='Horizontal' HorizontalAlignment='Center' VerticalAlignment='Center'>
+                <Control Style='{StaticResource LmSpinner}' />
+                <TextBlock Text='Checking license…' Margin='10,0,0,0' VerticalAlignment='Center'
+                           Style='{StaticResource LmCaption}' />
+              </StackPanel>
+            </Border>
           </Grid>
         </Border>
       </DataTemplate>
@@ -181,7 +191,7 @@
             <ItemsControl Margin='13,13,1,1' ItemsSource='{Binding Products}' ItemTemplate='{StaticResource LmProductCard}'>
               <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                  <WrapPanel ItemWidth='332' />
+                  <UniformGrid Columns='2' />
                 </ItemsPanelTemplate>
               </ItemsControl.ItemsPanel>
             </ItemsControl>
@@ -253,7 +263,7 @@
         <ItemsControl ItemsSource='{Binding Products}' ItemTemplate='{StaticResource LmProductCard}'>
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
-              <WrapPanel ItemWidth='332' />
+              <UniformGrid Columns='2' />
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
         </ItemsControl>
@@ -263,7 +273,7 @@
 
   <Border Background='{StaticResource LmPaperBrush}'>
     <ScrollViewer VerticalScrollBarVisibility='Auto' HorizontalScrollBarVisibility='Disabled' Padding='22'>
-      <StackPanel MaxWidth='900'>
+      <StackPanel MaxWidth='1100'>
 
         <!-- identity (the layout is chosen by the developer, not switchable here) -->
         <Grid Margin='0,0,0,20'>
