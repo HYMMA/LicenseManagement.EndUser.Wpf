@@ -2,13 +2,13 @@
 <package>
 	<metadata minClientVersion="2.5">
 		<id>LicenseManagement.EndUser.Wpf</id>
-		<version>2.3.4</version>
+		<version>2.4.0</version>
 		<authors>HYMMA</authors>
 		<owners>HYMMA</owners>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<license type="expression">MIT</license>
 		<description>WPF UI components for license-management.com end-user SDK. Provides ready-to-use Window and UserControl components, view models, and converters for license registration and management workflows. Bundles all required dependencies for easy deployment.</description>
-		<releaseNotes>2.3.4: Clearer status labels — "Unverified"→"Couldn't verify", "Expired"→"File Expired", "Renewal needed"→"Subscription Ended", "Not registered"→"Computer Unregistered" (and the matching meta line). 2.3.3: Cards now load their licence state asynchronously with a per-card spinner — the window paints immediately, never freezes, and each card shows a "Checking license…" spinner while it (or a Check/Register/Unregister action) runs. 2.3.2: The window no longer reads every product's licence on open (which blocked the UI thread and, for non-valid states, hit the server, leaving the window painted-but-frozen for a beat). Cards a host has already validated are shown immediately via UpdateLicenseSnapshot; the rest load on demand when opened. 2.3.1: Fixes on top of 2.3.0's grouped-card UI. MainWindow now renders products when License is assigned in code (a bare {Binding} resolved against the control's own default DataContext, so a code-set License never reached the control). Product cards now stretch to fill the window instead of sitting at a fixed width with dead space. Buttons gained real hover and pressed states. All product statuses load on open (offline per-product read) instead of only the first card. The validity meter no longer reads ~0% when a server date is missing — a default(DateTime) period start is treated as unknown rather than spanning ~2000 years. 2.3.0: Redesigned license UI — products render as grouped cards (Bands / Lanes / Switcher) with per-card status, validity meter and actions; group via LicenseViewModel.ApplyGrouping(...) or App.config. Existing LicenseViewModel.License / FromContext usage is unchanged.</releaseNotes>
+		<releaseNotes>2.4.0: Machine identity v2 via LicenseManagement.EndUser 3.3.0 — the device id is now the per-install Windows MachineGuid fingerprint, fixing cross-machine id collisions (shared CPU model + placeholder OEM board serials) that could show another customer's computer name and trial state in the license window; existing installs are re-keyed server-side, no user action needed. 2.3.4: Clearer status labels — "Unverified"→"Couldn't verify", "Expired"→"File Expired", "Renewal needed"→"Subscription Ended", "Not registered"→"Computer Unregistered" (and the matching meta line). 2.3.3: Cards now load their licence state asynchronously with a per-card spinner — the window paints immediately, never freezes, and each card shows a "Checking license…" spinner while it (or a Check/Register/Unregister action) runs. 2.3.2: The window no longer reads every product's licence on open (which blocked the UI thread and, for non-valid states, hit the server, leaving the window painted-but-frozen for a beat). Cards a host has already validated are shown immediately via UpdateLicenseSnapshot; the rest load on demand when opened. 2.3.1: Fixes on top of 2.3.0's grouped-card UI. MainWindow now renders products when License is assigned in code (a bare {Binding} resolved against the control's own default DataContext, so a code-set License never reached the control). Product cards now stretch to fill the window instead of sitting at a fixed width with dead space. Buttons gained real hover and pressed states. All product statuses load on open (offline per-product read) instead of only the first card. The validity meter no longer reads ~0% when a server date is missing — a default(DateTime) period start is treated as unknown rather than spanning ~2000 years. 2.3.0: Redesigned license UI — products render as grouped cards (Bands / Lanes / Switcher) with per-card status, validity meter and actions; group via LicenseViewModel.ApplyGrouping(...) or App.config. Existing LicenseViewModel.License / FromContext usage is unchanged.</releaseNotes>
 		<projectUrl>https://github.com/HYMMA/LicenseManagement.EndUser.Wpf</projectUrl>
 		<repository type="git" url="https://github.com/HYMMA/LicenseManagement.EndUser.Wpf.git" />
 		<readme>README.md</readme>
@@ -20,7 +20,7 @@
 			     no package dependencies — but the group must be declared to match the folder. -->
 			<group targetFramework=".NETFramework4.8.1" />
 			<group targetFramework="net8.0-windows7.0">
-				<dependency id="LicenseManagement.EndUser" version="3.1.1" />
+				<dependency id="LicenseManagement.EndUser" version="3.3.0" />
 				<dependency id="System.Configuration.ConfigurationManager" version="9.0.17" />
 			</group>
 		</dependencies>
@@ -34,7 +34,7 @@
 		<file src="bin\Release\LicenseManagement.EndUser.Wpf.dll" target="lib\net481" />
 		<file src="bin\Release\LicenseManagement.EndUser.Wpf.pdb" target="lib\net481" />
 		<!-- Bundled dependencies from EndUser package -->
-		<file src="packages\LicenseManagement.EndUser.3.1.1\lib\net481\LicenseManagement.EndUser.dll" target="lib\net481" />
+		<file src="packages\LicenseManagement.EndUser.3.3.0\lib\net481\LicenseManagement.EndUser.dll" target="lib\net481" />
 		<!-- Bundled dependencies from other packages -->
 		<file src="packages\Hymma.HttpClientFactory.1.0.8\lib\net45\Hymma.HttpClientFactory.dll" target="lib\net481" />
 		<file src="packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll" target="lib\net481" />

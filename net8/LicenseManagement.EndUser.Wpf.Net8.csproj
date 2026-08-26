@@ -33,7 +33,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LicenseManagement.EndUser" Version="3.1.1" />
+    <PackageReference Include="LicenseManagement.EndUser" Version="3.3.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.17" />
   </ItemGroup>
 
