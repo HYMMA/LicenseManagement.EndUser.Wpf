@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-09-09
+
+### Security
+- **`System.Configuration.ConfigurationManager` moved from 9.0.17 to 10.0.12**, and
+  `LicenseManagement.EndUser` to 3.4.0, which makes the same move for
+  `System.Security.Cryptography.Xml` and `System.Management`. The 9.0.x line carries
+  [GHSA-23rf-6693-g89p](https://github.com/advisories/GHSA-23rf-6693-g89p) and four
+  sibling advisories, and a Black Duck scan on an Autodesk App Store submission
+  rejected the package over exactly this. 10.0.x also has the longer support runway:
+  9.0.x ends 10 November 2026, 10.0.x runs to November 2028.
+
+### Notes
+- **Not a .NET 10 migration.** The net8 assembly still targets `net8.0-windows`; the
+  10.0.x packages ship a real `lib/net8.0` asset, so consumers keep running on .NET 8
+  hosts. The `net481` assembly is untouched.
+
+### Fixed
+- **The release workflow could not have published this package.** `publish.yml` hard-coded
+  `LicenseManagement.EndUser` at 3.1.1 in two places while the csproj and nuspec said
+  3.3.0, so `nuget pack` would have looked for a `packages\LicenseManagement.EndUser.3.3.0\`
+  directory that was never installed. The version is now read from the csproj, and the
+  workflow fails loudly if the csproj and nuspec disagree.
+
+## [2.4.0] - 2026-08-26
+
+This entry was missing; recorded here so the release-notes extraction in `publish.yml`
+has something to find.
+
+### Added
+- **Machine identity v2** via `LicenseManagement.EndUser` 3.3.0. The device id is now a
+  fingerprint of the per-install Windows `MachineGuid`, which fixes cross-machine id
+  collisions caused by shared CPU models and placeholder OEM board serials. Those
+  collisions could show another customer's computer name and trial state in the licence
+  window. Existing installs are re-keyed server-side, so no user action is needed.
 ## [2.3.4] - 2026-06-26
 
 First public release since 2.3.0 — fixes the empty-window regression and several UI issues

@@ -51,13 +51,37 @@ jobs:
           echo "EXISTS=false" >> $env:GITHUB_OUTPUT
         }
 
+    # Read the EndUser version from the csproj rather than hard-coding it here. This step
+    # used to say 3.1.1 while the csproj and nuspec said 3.3.0, which would have failed the
+    # pack (the nuspec bundles packages\LicenseManagement.EndUser.<version>\...). Deriving it
+    # from the single source of truth means the two can never drift again.
+    - name: Resolve LicenseManagement.EndUser version
+      if: steps.check_nuget.outputs.EXISTS != 'true'
+      id: enduser
+      shell: pwsh
+      run: |
+        $csproj = Get-Content LicenseManagement.EndUser.Wpf.csproj -Raw
+        if ($csproj -notmatch '<LicenseEndUserVersion>([^<]+)</LicenseEndUserVersion>') {
+          throw "LicenseEndUserVersion not found in LicenseManagement.EndUser.Wpf.csproj"
+        }
+        $enduser = $Matches[1]
+        $nuspec = Get-Content nugetSpec.nuspec -Raw
+        if ($nuspec -notmatch '<dependency id="LicenseManagement.EndUser" version="([^"]+)"') {
+          throw "LicenseManagement.EndUser dependency not found in nugetSpec.nuspec"
+        }
+        if ($Matches[1] -ne $enduser) {
+          throw "Version drift: csproj says $enduser, nuspec says $($Matches[1])"
+        }
+        echo "Using LicenseManagement.EndUser $enduser"
+        echo "VERSION=$enduser" >> $env:GITHUB_OUTPUT
+
     - name: Install LicenseManagement.EndUser from NuGet
       if: steps.check_nuget.outputs.EXISTS != 'true'
       shell: pwsh
       run: |
         # Install the EndUser package first (required for build). Must match the version the
         # net481 assembly is built against AND the one bundled in the nuspec (see below).
-        nuget install LicenseManagement.EndUser -Version 3.1.1 -OutputDirectory packages
+        nuget install LicenseManagement.EndUser -Version ${{ steps.enduser.outputs.VERSION }} -OutputDirectory packages
 
     - name: Restore NuGet packages
       if: steps.check_nuget.outputs.EXISTS != 'true'
@@ -72,7 +96,7 @@ jobs:
 
     - name: Build Release
       if: steps.check_nuget.outputs.EXISTS != 'true'
-      run: msbuild LicenseManagement.EndUser.Wpf.csproj /p:Configuration=Release /p:Platform=AnyCPU /p:LicenseEndUserVersion=3.1.1
+      run: msbuild LicenseManagement.EndUser.Wpf.csproj /p:Configuration=Release /p:Platform=AnyCPU /p:LicenseEndUserVersion=${{ steps.enduser.outputs.VERSION }}
 
     # Build the sibling net8.0-windows assembly (links the same XAML + sources). Its
     # output is packed into lib/net8.0-windows7.0 alongside the unchanged net481 assembly.
