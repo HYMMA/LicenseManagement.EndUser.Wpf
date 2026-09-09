@@ -52,4 +52,5 @@ using System.Windows;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("2.3.0.0")]
-[assembly: AssemblyFileVersion("2.4.0.0")]
+// Keep in step with <version> in nugetSpec.nuspec - see the note in EndUser's AssemblyInfo.
+[assembly: AssemblyFileVersion("2.5.1.0")]

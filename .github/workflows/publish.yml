@@ -30,6 +30,26 @@ jobs:
         $version = "${{ github.ref_name }}" -replace '^v', ''
         echo "VERSION=$version" >> $env:GITHUB_OUTPUT
 
+    # The nuspec version and AssemblyFileVersion are maintained in different files, and they
+    # drifted once already: 3.4.0 shipped a DLL stamped 3.3.0.0, so a support call would read
+    # the wrong version off the binary. Fail loudly rather than publish a mislabelled package.
+    - name: Check AssemblyFileVersion matches the tag
+      shell: pwsh
+      run: |
+        $tag = "${{ steps.get_version.outputs.VERSION }}"
+        $info = Get-ChildItem -Recurse -Filter AssemblyInfo.cs |
+                Where-Object { $_.FullName -notmatch "\\(obj|bin|packages|samples|Test)\\" } |
+                Select-Object -First 1
+        if (-not $info) { throw "AssemblyInfo.cs not found" }
+        $text = Get-Content $info.FullName -Raw
+        if ($text -notmatch 'AssemblyFileVersion\("([0-9]+\.[0-9]+\.[0-9]+)') {
+          throw "AssemblyFileVersion not found in $($info.FullName)"
+        }
+        $file = $Matches[1]
+        if ($file -ne $tag) {
+          throw "Version mismatch: tag/nuspec is $tag but AssemblyFileVersion is $file ($($info.Name))"
+        }
+        echo "AssemblyFileVersion $file matches $tag"
     - name: Check if NuGet package already exists
       id: check_nuget
       shell: pwsh
