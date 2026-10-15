@@ -111,6 +111,9 @@
                       </Style>
                     </Button.Style>
                   </Button>
+                  <!-- a license file from the portal or an email, for a computer that can't connect -->
+                  <Button Content='Install file…' Style='{StaticResource LmLinkButton}' Click='OnInstallFileClick'
+                          ToolTip='Install a license file you downloaded or were emailed' />
                 </StackPanel>
                 <!-- receipt code on its own line so long codes never crowd the buttons -->
                 <TextBlock Margin='2,9,0,0' TextTrimming='CharacterEllipsis'
@@ -317,6 +320,14 @@
               <Ellipse Width='3' Height='3' Margin='8,0,8,0' VerticalAlignment='Center' Fill='{StaticResource LmFaintBrush}' />
               <TextBlock Text='{Binding ComputerName}' Style='{StaticResource LmMono}' VerticalAlignment='Center' />
             </StackPanel>
+            <!-- the id the license portal accepts to activate exactly this computer -->
+            <StackPanel Orientation='Horizontal' Margin='0,3,0,0'>
+              <TextBlock Text='Device ID ' Style='{StaticResource LmCaption}' VerticalAlignment='Center' />
+              <TextBlock Text='{Binding DeviceId}' Style='{StaticResource LmMono}' VerticalAlignment='Center'
+                         MaxWidth='230' TextTrimming='CharacterEllipsis' ToolTip='{Binding DeviceId}' />
+              <Button Content='Copy' Style='{StaticResource LmLinkButton}' Margin='6,0,0,0' Click='OnCopyDeviceIdClick'
+                      ToolTip='Copy the device ID, e.g. to activate this computer in the license portal' />
+            </StackPanel>
           </StackPanel>
 
         </Grid>
@@ -372,10 +383,15 @@
         </TabControl>
 
         <!-- footer -->
-        <StackPanel Orientation='Horizontal' Margin='2,16,0,0'>
-          <TextBlock Text='Powered by ' Style='{StaticResource LmMono}' />
-          <TextBlock Text='License-management.com' Style='{StaticResource LmMono}' Foreground='{StaticResource LmMutedBrush}' />
-        </StackPanel>
+        <Grid Margin='2,16,0,0'>
+          <StackPanel Orientation='Horizontal' VerticalAlignment='Center'>
+            <TextBlock Text='Powered by ' Style='{StaticResource LmMono}' />
+            <TextBlock Text='License-management.com' Style='{StaticResource LmMono}' Foreground='{StaticResource LmMutedBrush}' />
+          </StackPanel>
+          <Button Content='Manage licenses online' Style='{StaticResource LmLinkButton}' HorizontalAlignment='Right'
+                  Click='OnOpenPortalClick' Visibility='{Binding HasPortal, Converter={StaticResource BoolToVis}}'
+                  ToolTip='{Binding PortalUrl}' />
+        </Grid>
 
       </StackPanel>
     </ScrollViewer>

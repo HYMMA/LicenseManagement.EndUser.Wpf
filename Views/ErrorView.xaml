@@ -17,6 +17,7 @@
       <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source='pack://application:,,,/LicenseManagement.EndUser.Wpf;component/AppResources.xaml' />
       </ResourceDictionary.MergedDictionaries>
+      <BooleanToVisibilityConverter x:Key='BoolToVis' />
     </ResourceDictionary>
   </Window.Resources>
 
@@ -39,12 +40,23 @@
       <StackPanel>
         <TextBlock Text='{Binding Path=Message}' Foreground='{StaticResource LmInkBrush}'
                    FontSize='13' TextWrapping='Wrap' />
-        <TextBlock Margin='0,8,0,0' Text='{Binding Path=InnerException.Message, FallbackValue={x:Null}}'
+        <TextBlock Margin='0,8,0,0' Text='{Binding Path=Detail}'
                    Style='{StaticResource LmCaption}' TextWrapping='Wrap' />
-        <TextBlock Margin='0,6,0,0' Text='{Binding Path=InnerException.InnerException.Message, FallbackValue={x:Null}}'
+        <TextBlock Margin='0,6,0,0' Text='{Binding Path=MoreDetail}'
                    Style='{StaticResource LmCaption}' TextWrapping='Wrap' />
       </StackPanel>
     </Border>
+
+    <!-- the way out when the server can't be reached -->
+    <StackPanel Margin='0,16,0,0' Visibility='{Binding HasRecovery, Converter={StaticResource BoolToVis}}'>
+      <TextBlock Text='You can still activate this computer without connecting:' Style='{StaticResource LmCaption}' TextWrapping='Wrap' />
+      <WrapPanel Margin='0,8,0,0'>
+        <Button Content='Open license portal' Style='{StaticResource LmGhostButton}' Margin='0,0,8,0'
+                Click='OnOpenPortalClick' Visibility='{Binding CanOpenPortal, Converter={StaticResource BoolToVis}}' />
+        <Button Content='Install license file…' Style='{StaticResource LmGhostButton}'
+                Click='OnInstallFileClick' Visibility='{Binding CanInstallLicenseFile, Converter={StaticResource BoolToVis}}' />
+      </WrapPanel>
+    </StackPanel>
 
     <StackPanel Orientation='Horizontal' HorizontalAlignment='Right' Margin='0,18,0,0'>
       <Button Content='OK' IsCancel='True' IsDefault='True' Style='{StaticResource LmPrimaryButton}' MinWidth='110' />

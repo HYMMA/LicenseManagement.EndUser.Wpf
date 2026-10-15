@@ -39,6 +39,8 @@ namespace LicenseManagement.EndUser.Wpf.Configuration
                     ValidDays = validDays,
                     VendorId = ConfigurationManager.AppSettings.Get("vendorId") ?? string.Empty,
                     PublicKey = ConfigurationManager.AppSettings.Get("publicKey") ?? string.Empty,
+                    // optional: the vendor's license portal, offered when the server can't be reached
+                    PortalUrl = ConfigurationManager.AppSettings.Get("portalUrl"),
                 };
                 vm.SetApiKey(ConfigurationManager.AppSettings.Get("ApiKey") ?? string.Empty);
 

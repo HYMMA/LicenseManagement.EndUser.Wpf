@@ -87,6 +87,28 @@ namespace LicenseManagement.EndUser.Wpf.Views
         private void OnRenewClick(object sender, RoutedEventArgs e) =>
             InvokeOnProduct(sender, License?.RenewLicenseFile);
 
+        private void OnInstallFileClick(object sender, RoutedEventArgs e)
+        {
+            var product = (sender as FrameworkElement)?.DataContext as ProductViewModel;
+            License?.InstallLicenseFile(product, this);
+        }
+
+        private void OnCopyDeviceIdClick(object sender, RoutedEventArgs e)
+        {
+            var id = License?.DeviceId;
+            if (string.IsNullOrEmpty(id)) return;
+            try
+            {
+                Clipboard.SetText(id);
+            }
+            catch (System.Runtime.InteropServices.COMException)
+            {
+                // the clipboard is briefly locked by another app; the id is still in the tooltip
+            }
+        }
+
+        private void OnOpenPortalClick(object sender, RoutedEventArgs e) => License?.OpenPortal();
+
         private void InvokeOnProduct(object sender, ICommand command)
         {
             var product = (sender as FrameworkElement)?.DataContext as ProductViewModel;

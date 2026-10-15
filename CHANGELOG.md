@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2026-10-15
+
+### Added
+- **Activate a computer that can't reach the license server.** When a check, download
+  or registration fails because the server is unreachable, the error dialog now offers
+  **Install license file…** (pick a `.lic` downloaded from the portal or received by
+  email; it is verified for this product and computer before it replaces anything) and,
+  when `portalUrl` is configured, **Open license portal**. Each product card also has an
+  **Install file…** link.
+- **Device ID** with a **Copy** link in the header. The license portal accepts it to
+  activate exactly this computer.
+- `portalUrl` app setting / `LicenseViewModel.PortalUrl`; when set, the footer links to
+  the vendor's license portal.
+
+### Changed
+- Requires `LicenseManagement.EndUser` 3.5.0. Network failures now say what failed
+  (e.g. "This computer's network could not find license-management.com … ask your IT
+  team to allow it") instead of a generic "could not connect".
+- The error dialog's `DataContext` is now an `ErrorViewModel` (the exception is its
+  `Error` property). Override `CreateErrorViewModel` to add recovery actions.
+
 ## [2.5.1] - 2026-09-09
 
 ### Fixed

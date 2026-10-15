@@ -59,10 +59,17 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
             {
                 Owner = owner,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                DataContext = exception
+                DataContext = CreateErrorViewModel(exception, source)
             };
             view.ShowDialog();
         }
+
+        /// <summary>
+        /// Builds what the error dialog shows. Override to offer recovery actions (e.g. install a
+        /// license file by hand when the server is unreachable).
+        /// </summary>
+        protected virtual ErrorViewModel CreateErrorViewModel(Exception exception, DependencyObject source) =>
+            new ErrorViewModel(exception);
 
         public event PropertyChangedEventHandler PropertyChanged;
 

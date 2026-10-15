@@ -365,6 +365,95 @@ namespace LicenseManagement.EndUser.Wpf.ViewModels
 
         public string PublicKey { get; internal set; }
 
+        private string _portalUrl;
+
+        /// <summary>
+        /// The vendor's license portal (e.g. https://license-management.com/Portal/{slug}), where a
+        /// customer can activate a computer and download its license file in a browser. Optional:
+        /// when set, the dialog offers it whenever the license server can't be reached.
+        /// </summary>
+        public string PortalUrl
+        {
+            get => _portalUrl;
+            set { if (_portalUrl != value) { _portalUrl = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasPortal)); } }
+        }
+
+        public bool HasPortal => !string.IsNullOrWhiteSpace(_portalUrl);
+
+        /// <summary>
+        /// This computer's id as the license server knows it. The portal accepts it to activate
+        /// exactly this machine when it can't connect itself.
+        /// </summary>
+        public string DeviceId => ComputerId.Instance.EffectiveMachineId;
+
+        /// <summary>The folder license files live in, as users type it (Win + R).</summary>
+        public string LicenseFolder => LicenseFileLocation.GetDisplayFolder(VendorId);
+
+        /// <summary>Opens <see cref="PortalUrl"/> in the default browser.</summary>
+        public void OpenPortal()
+        {
+            if (!HasPortal) return;
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(_portalUrl) { UseShellExecute = true });
+            }
+            catch (Exception e) when (e is System.ComponentModel.Win32Exception || e is InvalidOperationException)
+            {
+                LicenseHandlingOptions.Logger.Log(Diagnostics.LicenseLogLevel.Warning, $"Could not open the license portal {_portalUrl}: {e.Message}", e);
+            }
+        }
+
+        /// <summary>
+        /// Lets the user pick a license file they downloaded or were emailed, verifies it for
+        /// <paramref name="product"/> on this computer and installs it, then re-reads the card.
+        /// The way to activate a computer that can't reach the license server.
+        /// </summary>
+        public void InstallLicenseFile(ProductViewModel product, DependencyObject source)
+        {
+            if (product == null) return;
+            MakeActive(product);
+
+            var picker = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = $"Install license file for {product.Name}",
+                Filter = "License files (*.lic)|*.lic|All files (*.*)|*.*",
+                CheckFileExists = true
+            };
+            var owner = source as Window ?? (source != null ? Window.GetWindow(source) : null);
+            if (picker.ShowDialog(owner) != true) return;
+
+            var prefs = PublisherPreferencesFactory.Build(VendorId, product.Id, _apiKey, PublicKey, ValidDays);
+            var result = LicenseFileImporter.Import(prefs, picker.FileName);
+            if (!result.Succeeded)
+            {
+                ShowErrorView(source, new InvalidOperationException(result.Message));
+                return;
+            }
+            RefreshProduct(product, source);   // reads the file just installed, with the card spinner
+        }
+
+        protected override ErrorViewModel CreateErrorViewModel(Exception exception, DependencyObject source)
+        {
+            var vm = base.CreateErrorViewModel(exception, source);
+            if (IsUnreachable(exception))
+            {
+                var product = Product;
+                if (product != null)
+                    vm.InstallLicenseFile = () => InstallLicenseFile(product, source);
+                if (HasPortal)
+                    vm.OpenPortal = OpenPortal;
+            }
+            return vm;
+        }
+
+        private static bool IsUnreachable(Exception exception)
+        {
+            for (var e = exception; e != null; e = e.InnerException)
+                if (e is Exceptions.NetworkUnavailableException || e is System.Net.Http.HttpRequestException)
+                    return true;
+            return false;
+        }
+
         /// <summary>
         /// Loads every not-yet-loaded product's licence state in the background, showing a
         /// per-card spinner while each read runs. Reads are awaited one at a time so they

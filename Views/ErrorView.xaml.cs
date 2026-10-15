@@ -1,16 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LicenseManagement.EndUser.Wpf.ViewModels;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace LicenseManagement.EndUser.Wpf.Views
 {
@@ -22,6 +11,20 @@ namespace LicenseManagement.EndUser.Wpf.Views
         public ErrorView()
         {
             InitializeComponent();
+        }
+
+        private void OnOpenPortalClick(object sender, RoutedEventArgs e)
+        {
+            // the browser opens alongside; keep this dialog so the user can come back to Install
+            (DataContext as ErrorViewModel)?.OpenPortal?.Invoke();
+        }
+
+        private void OnInstallFileClick(object sender, RoutedEventArgs e)
+        {
+            // close first: the file picker and the refreshed card belong to the license window
+            var install = (DataContext as ErrorViewModel)?.InstallLicenseFile;
+            Close();
+            install?.Invoke();
         }
     }
 }
