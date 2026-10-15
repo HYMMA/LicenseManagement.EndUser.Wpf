@@ -69,6 +69,7 @@
     <Compile Include="Rules\ReceiptCodeRule.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="ViewModels\ErrorViewModel.cs" />
     <Compile Include="ViewModels\LicenseViewModel.cs" />
     <Compile Include="ViewModels\ProductLayout.cs" />
     <Compile Include="ViewModels\ProductGroupViewModel.cs" />
